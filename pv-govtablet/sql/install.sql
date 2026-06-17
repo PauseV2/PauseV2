@@ -48,12 +48,12 @@ CREATE TABLE IF NOT EXISTS `gt_criminal_records` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Tracks frozen / hidden state of a citizen's money "accounts"
--- (cash / bank / crypto). Read by the banking bridge and exported
--- for other resources (e.g. qb-banking) to check before allowing
--- a transaction.
+-- (bank / crypto - cash on hand isn't trackable by government staff).
+-- Read by the banking bridge and exported for other resources
+-- (e.g. qb-banking) to check before allowing a transaction.
 CREATE TABLE IF NOT EXISTS `gt_account_freezes` (
     `citizenid` VARCHAR(50) NOT NULL,
-    `account_type` ENUM('cash','bank','crypto') NOT NULL,
+    `account_type` ENUM('bank','crypto') NOT NULL,
     `frozen` TINYINT(1) NOT NULL DEFAULT 0,
     `hidden` TINYINT(1) NOT NULL DEFAULT 0,
     `reason` TEXT DEFAULT NULL,
@@ -67,7 +67,7 @@ CREATE TABLE IF NOT EXISTS `gt_account_freezes` (
 CREATE TABLE IF NOT EXISTS `gt_fund_seizures` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `citizenid` VARCHAR(50) NOT NULL,
-    `account_type` ENUM('cash','bank','crypto') NOT NULL,
+    `account_type` ENUM('bank','crypto') NOT NULL,
     `amount` INT UNSIGNED NOT NULL,
     `reason` TEXT NOT NULL,
     `seized_by` VARCHAR(100) NOT NULL,

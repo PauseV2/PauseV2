@@ -2,10 +2,14 @@
     Banking bridge
     --------------
     Reads/writes balances directly on the QBCore player object
-    (PlayerData.money.cash / bank / crypto) which is what qb-management,
+    (PlayerData.money.bank / crypto) which is what qb-management,
     qb-banking and most money scripts read from. Freeze/hide state is
     kept in its own overlay table (gt_account_freezes) so it survives
     independently of whatever banking script you run.
+
+    Cash on hand is deliberately not tracked here - government staff
+    have no realistic way to see physical cash a citizen is carrying,
+    so it's excluded from Config.MoneyTypes entirely.
 
     Other resources should call:
         exports['pv-govtablet']:IsAccountFrozen(citizenid, 'bank')
@@ -17,12 +21,12 @@ local QBCore = exports['qb-core']:GetCoreObject()
 
 Banking = {}
 
--- citizenid -> { cash = {frozen,hidden}, bank = {...}, crypto = {...} }
+-- citizenid -> { bank = {frozen,hidden}, crypto = {...} }
 local freezeCache = {}
 
 local function loadFreezeState(citizenid)
     local rows = MySQL.query.await('SELECT account_type, frozen, hidden FROM gt_account_freezes WHERE citizenid = ?', { citizenid })
-    local state = { cash = { frozen = false, hidden = false }, bank = { frozen = false, hidden = false }, crypto = { frozen = false, hidden = false } }
+    local state = { bank = { frozen = false, hidden = false }, crypto = { frozen = false, hidden = false } }
     if rows then
         for _, row in ipairs(rows) do
             state[row.account_type] = { frozen = row.frozen == 1, hidden = row.hidden == 1 }

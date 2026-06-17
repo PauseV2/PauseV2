@@ -229,7 +229,7 @@
       return;
     }
 
-    const types = { cash: 'Cash on Hand', bank: 'Bank Account', crypto: 'Crypto Wallet' };
+    const types = { bank: 'Bank Account', crypto: 'Crypto Wallet' };
     grid.innerHTML = Object.entries(types).map(([key, label]) => {
       const f = state.profile.finance[key] || { amount: 0, frozen: false, hidden: false };
       let actions = '';

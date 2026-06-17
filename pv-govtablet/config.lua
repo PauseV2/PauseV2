@@ -21,8 +21,10 @@ Config.MaxActionsPerMinute = 20    -- generic write-action rate limit per player
 -- unless the acting staff member already holds the `approveSeizure` permission.
 Config.RequireJudgeApproval = true
 
--- Money "accounts" tracked on the QBCore player object (PlayerData.money)
-Config.MoneyTypes = { 'cash', 'bank', 'crypto' }
+-- Money "accounts" tracked on the QBCore player object (PlayerData.money).
+-- Cash on hand is intentionally excluded - government staff have no
+-- realistic way to know how much physical cash someone is carrying.
+Config.MoneyTypes = { 'bank', 'crypto' }
 
 -- Job / role permission matrix. `minGrade` is the minimum job grade level
 -- required, `permissions` controls which actions that job is allowed to
