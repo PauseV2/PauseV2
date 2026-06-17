@@ -11,8 +11,9 @@ ever hides/shows buttons for convenience — it has no authority of its own.
 
 - Citizen search by name, citizen ID, phone number or plate
 - Full profile view: identity, finances, properties, vehicles, criminal record
+- Automatic citizen photo capture on first login (optional, via screenshot-basic)
 - Bank account freeze / unfreeze / hide / reveal / seizure
-- Vehicle seizure, impound and release
+- Vehicle seizure (paperwork order, resolved by police in the field), impound and release
 - Property seizure and restoration (fully reversible)
 - Criminal record viewing + adding convictions
 - Judge approval queue for seizures (configurable)
@@ -26,6 +27,8 @@ ever hides/shows buttons for convenience — it has no authority of its own.
 - [qb-core](https://github.com/qbcore-framework/qb-core)
 - [oxmysql](https://github.com/overextended/oxmysql)
 - MySQL 5.7+ / MariaDB 10.2+ (for `JSON_EXTRACT`/`JSON_UNQUOTE` used in search)
+- [screenshot-basic](https://github.com/citizenfx/screenshot-basic) — optional,
+  only needed for automatic citizen photo capture (see below)
 
 ## Installation
 
@@ -147,9 +150,57 @@ with qb-core and is used by qb-garages and most forks (qs-advancedgarages,
 cd_garage, etc). If your garage script uses a different table/columns,
 update `Config.Bridge.Garage`.
 
-Seizing or impounding a vehicle simply sets its `state` column to `2`
-(impound) — the same value your garage script already uses to keep
-impounded vehicles out of the normal spawn list. No rows are deleted.
+**Seize** and **impound** are deliberately different actions:
+
+- **Impound** is immediate — it sets the `state` column to `2` (impound),
+  the same value your garage script already uses to keep impounded
+  vehicles out of the normal spawn list. No rows are deleted.
+- **Seize** is a paperwork order, not a physical one. It only flags the
+  vehicle in `gt_vehicle_seizures` with a reason (e.g. "Not paying taxes",
+  "Purchased with criminal money") — the car stays exactly where it was,
+  still drivable/in the owner's garage, until police actually find it.
+  Your police/MDT resource should check the flag whenever an officer runs
+  a plate, and resolve it once the vehicle is physically impounded:
+
+  ```lua
+  -- when an officer runs a plate, e.g. in your ALPR/MDT lookup
+  local isSeized, reason = exports['pv-govtablet']:IsVehicleSeized(plate)
+  if isSeized then
+      TriggerClientEvent('QBCore:Notify', src, ('This vehicle is flagged for seizure: %s'):format(reason), 'error')
+  end
+
+  -- once the officer has physically impounded the flagged vehicle
+  exports['pv-govtablet']:ResolveVehicleSeizure(plate, officerName)
+  ```
+
+  `ResolveVehicleSeizure` puts the vehicle into impound (`state = 2`) and
+  marks the seizure as fulfilled, exactly as if staff had used the
+  tablet's direct Impound action.
+
+### Automatic citizen photos
+
+By default, staff have to paste a photo URL into a citizen's profile by
+hand. If you run [screenshot-basic](https://github.com/citizenfx/screenshot-basic),
+the tablet can instead capture a photo of a citizen's character automatically
+the first time they load in, so most profiles already have a picture before
+staff ever open the tablet:
+
+```lua
+Config.AutoPhoto = {
+    Enabled          = true,             -- master switch
+    Resource         = 'screenshot-basic',
+    Webhook          = '',               -- Discord webhook screenshot-basic uploads to (required)
+    Delay            = 2500,             -- ms to wait after spawn before capturing, so the ped/clothing is fully loaded
+    RetakeEveryLogin = false,            -- if true, re-captures every login instead of only when no photo exists yet
+}
+```
+
+Set `Config.AutoPhoto.Webhook` to a Discord webhook URL to enable it — with
+it left blank, or `screenshot-basic` not running, this feature silently does
+nothing and staff can still set photos manually from the tablet. Captured
+photos are written to `gt_citizen_photos` with `is_auto = 1`; manually-set
+photos always use `is_auto = 0` and are never overwritten by an auto-capture
+once set.
 
 ### Banking systems (preventing use of frozen accounts)
 
@@ -190,6 +241,7 @@ pv-govtablet/
 ├── config.lua
 ├── shared/sh_utils.lua        -- shared validation helpers
 ├── client/cl_main.lua         -- NUI open/close + generic NUI->server forwarder
+├── client/cl_photo.lua        -- automatic citizen photo capture (optional)
 ├── server/sv_main.lua         -- permissions, callbacks, orchestration
 ├── server/sv_logs.lua         -- audit logging + Discord webhook
 ├── bridge/sv_banking.lua      -- money/freeze integration

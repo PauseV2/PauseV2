@@ -248,7 +248,7 @@ end
 local function executeSeizeVehicle(plate, reason, staff)
     local success, err = Garage.SeizeVehicle(plate, reason, staff.name)
     if success then
-        Logger.Add({ citizenid = staff.citizenid, name = staff.name, job = staff.job }, 'seize_vehicle', nil, ('Seized vehicle %s: %s'):format(plate, reason))
+        Logger.Add({ citizenid = staff.citizenid, name = staff.name, job = staff.job }, 'seize_vehicle', nil, ('Flagged vehicle %s for seizure: %s'):format(plate, reason))
     end
     return success, err
 end
@@ -460,13 +460,54 @@ QBCore.Functions.CreateCallback('pv-govtablet:server:setPhoto', function(source,
     if not photoUrl or not (photoUrl:match('^https?://') ) then return cb(false, 'invalid_url') end
 
     MySQL.query.await([[
-        INSERT INTO gt_citizen_photos (citizenid, photo_url, updated_by)
-        VALUES (?, ?, ?)
-        ON DUPLICATE KEY UPDATE photo_url = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
+        INSERT INTO gt_citizen_photos (citizenid, photo_url, is_auto, updated_by)
+        VALUES (?, ?, 0, ?)
+        ON DUPLICATE KEY UPDATE photo_url = ?, is_auto = 0, updated_by = ?, updated_at = CURRENT_TIMESTAMP
     ]], { citizenid, photoUrl, staff.name, photoUrl, staff.name })
 
     Logger.Add({ citizenid = staff.citizenid, name = staff.name, job = staff.job }, 'set_photo', citizenid)
     cb(true)
+end)
+
+-- ============================================================
+-- Auto photo capture
+-- Lets client/cl_photo.lua know whether it should bother taking and
+-- uploading a screenshot at all, then stores the resulting URL. The
+-- citizenid always comes from the player's own session server side -
+-- never trusted from the client - so nobody can plant a photo on
+-- another citizen's profile.
+-- ============================================================
+
+QBCore.Functions.CreateCallback('pv-govtablet:server:needsAutoPhoto', function(source, cb)
+    if not Config.AutoPhoto.Enabled then return cb(false) end
+
+    local Player = QBCore.Functions.GetPlayer(source)
+    if not Player then return cb(false) end
+
+    local row = MySQL.single.await('SELECT is_auto FROM gt_citizen_photos WHERE citizenid = ?', { Player.PlayerData.citizenid })
+    if not row then return cb(true) end
+    if Config.AutoPhoto.RetakeEveryLogin and row.is_auto == 1 then return cb(true) end
+
+    cb(false)
+end)
+
+RegisterNetEvent('pv-govtablet:server:saveAutoPhoto', function(photoUrl)
+    local src = source
+    if not Config.AutoPhoto.Enabled then return end
+
+    local Player = QBCore.Functions.GetPlayer(src)
+    if not Player then return end
+
+    photoUrl = Utils.SanitizeString(photoUrl, 500)
+    if not photoUrl or not photoUrl:match('^https?://') then return end
+
+    local citizenid = Player.PlayerData.citizenid
+
+    MySQL.query.await([[
+        INSERT INTO gt_citizen_photos (citizenid, photo_url, is_auto, updated_by)
+        VALUES (?, ?, 1, 'system')
+        ON DUPLICATE KEY UPDATE photo_url = ?, is_auto = 1, updated_by = 'system', updated_at = CURRENT_TIMESTAMP
+    ]], { citizenid, photoUrl, photoUrl })
 end)
 
 -- ============================================================

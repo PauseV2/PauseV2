@@ -300,11 +300,15 @@
       let status = v.impounded ? '<span class="pill warn-pill" style="background:var(--warn-soft);color:var(--warn);">Impounded</span>'
         : v.stored ? '<span class="pill active-pill">In Garage</span>'
         : '<span class="pill" style="background:var(--bg-3);color:var(--text-1);">Out</span>';
-      if (v.seized) status += ' <span class="pill frozen">Seized</span>';
+      if (v.seized) {
+        status += v.impounded
+          ? ' <span class="pill frozen">Seized</span>'
+          : ' <span class="pill warn-pill" style="background:var(--warn-soft);color:var(--warn);">Flagged for Seizure</span>';
+      }
 
       let actions = '';
       if (v.seized) {
-        if (perm('releaseVehicle')) actions += `<button class="action-btn success" data-act="releaseVehicle" data-plate="${v.plate}">Release Seizure</button>`;
+        if (perm('releaseVehicle')) actions += `<button class="action-btn success" data-act="releaseVehicle" data-plate="${v.plate}">Cancel Seizure</button>`;
       } else if (perm('seizeVehicle')) {
         actions += `<button class="action-btn danger" data-act="seizeVehicle" data-plate="${v.plate}">Seize</button>`;
       }
@@ -337,14 +341,18 @@
     }
 
     const isDanger = action === 'seizeVehicle';
-    const vals = await showModal(`${isDanger ? 'Seize' : 'Impound'} vehicle ${plate}`, [
-      { name: 'reason', label: 'Reason', type: 'textarea', placeholder: 'Reason...' },
-    ], isDanger ? 'Seize' : 'Impound', isDanger);
+    const vals = await showModal(
+      isDanger ? `Flag vehicle ${plate} for seizure` : `Impound vehicle ${plate}`,
+      [{ name: 'reason', label: 'Reason', type: 'textarea', placeholder: isDanger ? 'e.g. Not paying taxes, purchased with criminal money...' : 'Reason...' }],
+      isDanger ? 'Flag for Seizure' : 'Impound',
+      isDanger,
+    );
     if (!vals) return;
 
     const res = await post(action, [plate, vals.reason]);
     if (res.success) {
-      toast(res.data === 'pending_approval' ? 'Submitted for judge approval.' : 'Vehicle updated.', 'success');
+      if (res.data === 'pending_approval') toast('Submitted for judge approval.', 'success');
+      else toast(isDanger ? 'Vehicle flagged - police must locate and impound it.' : 'Vehicle updated.', 'success');
       refreshProfile();
     } else toast(friendlyError(res.data), 'error');
   }

@@ -24,6 +24,7 @@ CREATE TABLE IF NOT EXISTS `gt_logs` (
 CREATE TABLE IF NOT EXISTS `gt_citizen_photos` (
     `citizenid` VARCHAR(50) NOT NULL,
     `photo_url` TEXT DEFAULT NULL,
+    `is_auto` TINYINT(1) NOT NULL DEFAULT 0,
     `updated_by` VARCHAR(100) DEFAULT NULL,
     `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`citizenid`)

@@ -21,6 +21,20 @@ Config.MaxActionsPerMinute = 20    -- generic write-action rate limit per player
 -- unless the acting staff member already holds the `approveSeizure` permission.
 Config.RequireJudgeApproval = true
 
+-- Automatically captures a photo of each citizen's character (the model
+-- they spawn in as) the first time they load in, so staff don't have to
+-- manually set a photo URL. Requires the `screenshot-basic` resource
+-- (https://github.com/citizenfx/screenshot-basic) and a Discord webhook
+-- to upload the screenshot to - leave Webhook empty to disable and fall
+-- back to the manual "Set Photo URL" button only. See README.md.
+Config.AutoPhoto = {
+    Enabled          = true,
+    Resource         = 'screenshot-basic',
+    Webhook          = '',     -- dedicated Discord webhook URL for photo uploads
+    Delay            = 2500,   -- ms to wait after spawning before capturing, so the ped is fully streamed in
+    RetakeEveryLogin = false,  -- if false, only auto-captures once per citizen (won't override a manually set photo)
+}
+
 -- Money "accounts" tracked on the QBCore player object (PlayerData.money).
 -- Cash on hand is intentionally excluded - government staff have no
 -- realistic way to know how much physical cash someone is carrying.
