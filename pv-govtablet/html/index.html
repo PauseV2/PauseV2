@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Government Tablet</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div id="app" class="hidden">
+    <div class="tablet">
+
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark">GT</div>
+          <div class="brand-text">
+            <span class="brand-title">GOV-OS</span>
+            <span class="brand-sub">Secure Terminal</span>
+          </div>
+        </div>
+
+        <nav class="nav">
+          <button class="nav-item active" data-view="search">
+            <span class="nav-icon">&#128269;</span> Search
+          </button>
+          <button class="nav-item" data-view="profile" id="navProfile" disabled>
+            <span class="nav-icon">&#128100;</span> Profile
+          </button>
+          <button class="nav-item" data-view="approvals" id="navApprovals" style="display:none;">
+            <span class="nav-icon">&#9878;</span> Approvals
+          </button>
+          <button class="nav-item" data-view="logs" id="navLogs" style="display:none;">
+            <span class="nav-icon">&#128220;</span> Audit Log
+          </button>
+        </nav>
+
+        <div class="sidebar-footer">
+          <div class="role-badge">
+            <span class="role-dot"></span>
+            <div>
+              <div class="role-label" id="roleLabel">--</div>
+              <div class="role-sub">Authorized Session</div>
+            </div>
+          </div>
+          <button class="close-btn" id="closeBtn">Close &#10005;</button>
+        </div>
+      </aside>
+
+      <!-- Main -->
+      <main class="main">
+
+        <!-- SEARCH VIEW -->
+        <section class="view active" id="view-search">
+          <div class="view-header">
+            <h1>Citizen Lookup</h1>
+            <p class="subtle">Search the national registry by name, citizen ID, phone number or plate.</p>
+          </div>
+
+          <div class="search-bar">
+            <select id="searchType">
+              <option value="name">Full Name</option>
+              <option value="citizenid">Citizen ID</option>
+              <option value="phone">Phone Number</option>
+              <option value="plate">License Plate</option>
+            </select>
+            <input type="text" id="searchInput" placeholder="Type to search..." autocomplete="off" />
+            <button id="searchBtn">Search</button>
+          </div>
+
+          <div class="results" id="searchResults"></div>
+        </section>
+
+        <!-- PROFILE VIEW -->
+        <section class="view" id="view-profile">
+          <div class="profile-header">
+            <div class="profile-photo">
+              <img id="profilePhoto" src="img/placeholder.svg" alt="" />
+            </div>
+            <div class="profile-summary">
+              <h1 id="profileName">--</h1>
+              <div class="profile-tags">
+                <span class="tag" id="profileJob">--</span>
+                <span class="tag" id="profileCid">--</span>
+              </div>
+            </div>
+            <button class="ghost-btn" id="setPhotoBtn">Set Photo URL</button>
+          </div>
+
+          <div class="tabs">
+            <button class="tab-btn active" data-tab="overview">Overview</button>
+            <button class="tab-btn" data-tab="financial">Financial</button>
+            <button class="tab-btn" data-tab="vehicles">Vehicles</button>
+            <button class="tab-btn" data-tab="properties">Properties</button>
+            <button class="tab-btn" data-tab="criminal">Criminal Record</button>
+          </div>
+
+          <div class="tab-content active" id="tab-overview">
+            <div class="card-grid" id="overviewGrid"></div>
+          </div>
+
+          <div class="tab-content" id="tab-financial">
+            <div class="card-grid" id="financialGrid"></div>
+          </div>
+
+          <div class="tab-content" id="tab-vehicles">
+            <div class="list" id="vehicleList"></div>
+          </div>
+
+          <div class="tab-content" id="tab-properties">
+            <div class="list" id="propertyList"></div>
+          </div>
+
+          <div class="tab-content" id="tab-criminal">
+            <div class="criminal-actions">
+              <button class="primary-btn" id="addRecordBtn">+ Add Record</button>
+            </div>
+            <div class="timeline" id="criminalTimeline"></div>
+          </div>
+        </section>
+
+        <!-- APPROVALS VIEW -->
+        <section class="view" id="view-approvals">
+          <div class="view-header">
+            <h1>Pending Seizure Approvals</h1>
+            <p class="subtle">Requests submitted by staff without direct seizure authority.</p>
+          </div>
+          <div class="list" id="approvalList"></div>
+        </section>
+
+        <!-- LOGS VIEW -->
+        <section class="view" id="view-logs">
+          <div class="view-header">
+            <h1>Audit Log</h1>
+            <p class="subtle">Most recent 100 actions performed across the system.</p>
+          </div>
+          <div class="list" id="logList"></div>
+        </section>
+
+      </main>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal-overlay hidden" id="modalOverlay">
+      <div class="modal" id="modal"></div>
+    </div>
+
+    <!-- Toasts -->
+    <div class="toast-stack" id="toastStack"></div>
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
