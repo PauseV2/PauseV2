@@ -1,32 +1,40 @@
 # pv-govtablet — Government Tablet System
 
-This is not just a staff lookup menu — it's a financial oversight system
-that changes how crime has to work on your server. Every dollar that moves
-through a player's bank or crypto account is watched in real time. If
-Jimmy is unemployed but is suddenly driving a $1.3 million supercar, has a
-business he can't explain, or just deposited $900,000 with no paycheck or
-sale behind it, the tablet already knows before staff even go looking —
-the **High Risk Payments** tab flags it the instant the money moves, with
-the exact amount, account, reason string and timestamp attached.
+This is not an admin/staff (OOC) tool — it's an entirely in-character
+device, roleplayed by players whose **character** holds a government job
+(Mayor, Tax Agency, Government, DOJ, Police, Judges). No server staff or
+admin is involved in its use; it's the in-game equivalent of a government
+official pulling up someone's financial and legal file, and every action
+it takes is just that character doing their job.
+
+It's also a financial oversight system that changes how crime has to work
+on your server. Every dollar that moves through a player's bank or crypto
+account is watched in real time. If Jimmy is unemployed but is suddenly
+driving a $1.3 million supercar, has a business he can't explain, or just
+deposited $900,000 with no paycheck or sale behind it, the tablet already
+flags it the instant the money moves — the **High Risk Payments** tab shows
+the exact amount, account, reason string and timestamp, live, to whichever
+government-job characters are online and allowed to see it.
 
 That means money can no longer just disappear into a clean bank balance.
 A bank robbery, a drug deal, an illegal chip-dumping scheme through a
 front business — the second the cash lands or gets spent on something
-big, it's on the radar. The Tax Agency, Government and DOJ can trace it
-straight to the account, freeze it, seize it, and tie it to a criminal
-record, all from the same tablet. Players who want to launder money now
-have to actually launder it — spread it out, route it through a legitimate
-business, stay under the thresholds — instead of just walking up to an ATM.
+big, it's on the radar. The Tax Agency, Government and DOJ characters can
+trace it straight to the account, freeze it, seize it, and tie it to a
+criminal record, all from the same tablet. Players who want to launder
+money now have to actually launder it — spread it out, route it through a
+legitimate business, stay under the thresholds — instead of just walking
+up to an ATM.
 
-It cuts both ways: government and judicial roles get a real, provable
+It cuts both ways: government and judicial characters get a real, provable
 paper trail to act on (and judges can require approval before a seizure
 goes through, so it can't be abused), while criminals who play it smart —
 small amounts, real cover stories, patience — can still stay under the
 radar. It raises the skill ceiling on crime instead of removing it.
 
-Built on QBCore, it also covers the more everyday staff workflows: citizen
-lookup, financial/vehicle/property management, business oversight and
-criminal records.
+Built on QBCore, it also covers the more everyday roleplay workflows for
+these jobs: citizen lookup, financial/vehicle/property management,
+business oversight and criminal records.
 
 Every action is validated and re-checked **server side**. The NUI only
 ever hides/shows buttons for convenience — it has no authority of its own.
@@ -43,8 +51,9 @@ ever hides/shows buttons for convenience — it has no authority of its own.
 - Judge approval queue for seizures (configurable)
 - **High Risk Payments** tab — large vehicle purchases and unexplained bank/crypto
   deposits are flagged automatically the instant the money moves, with full
-  what/when/how detail, and pushed live to every online staff member who can see them
-- **Businesses** tab — staff roster, grades, pay and live account balance for
+  what/when/how detail, and pushed live to every online government-job
+  character who can see them
+- **Businesses** tab — employee roster, grades, pay and live account balance for
   every configured business, with deposit/withdrawal history and a direct
   link to that business's bank account
 - **Account Lookup** tab — search any citizen or business account number to
@@ -53,7 +62,7 @@ ever hides/shows buttons for convenience — it has no authority of its own.
 - Config-driven job/grade permission matrix
 - Bridge layer so it talks to your housing/garage/banking/business resources
   without hard dependencies, with everything synced live to the database so
-  every staff member sees the same state instantly
+  every government-job character sees the same state instantly
 
 ## Requirements
 
@@ -79,7 +88,7 @@ ever hides/shows buttons for convenience — it has no authority of its own.
    ```lua
    ['gov_tablet'] = { name = 'gov_tablet', label = 'Government Tablet', weight = 500, type = 'item', image = 'gov_tablet.png', unique = true, useable = true, shouldClose = true, description = 'Secure government access terminal' },
    ```
-   and give it to staff via your job's starting loadout, a shop, or
+   and give it to those jobs via their starting loadout, a shop, or
    `/giveitem` for testing. Drop the matching image into your inventory
    resource's `image` folder.
 5. Open `config.lua` and adjust `Config.Jobs` to match your job names exactly
@@ -118,7 +127,7 @@ permission on every single request.
 
 ## Judge approval queue
 
-When `Config.RequireJudgeApproval = true`, any staff member who lacks the
+When `Config.RequireJudgeApproval = true`, any character whose job lacks the
 `approveSeizure` permission has their fund/vehicle/property seizure requests
 queued in `gt_seizure_requests` instead of executed immediately. Online
 judges (any job with `approveSeizure = true`) are notified and can
@@ -207,16 +216,16 @@ update `Config.Bridge.Garage`.
   ```
 
   `ResolveVehicleSeizure` puts the vehicle into impound (`state = 2`) and
-  marks the seizure as fulfilled, exactly as if staff had used the
+  marks the seizure as fulfilled, exactly as if a tablet user had used the
   tablet's direct Impound action.
 
 ### Automatic citizen photos
 
-By default, staff have to paste a photo URL into a citizen's profile by
-hand. If you run [screenshot-basic](https://github.com/citizenfx/screenshot-basic),
+By default, a tablet user has to paste a photo URL into a citizen's profile
+by hand. If you run [screenshot-basic](https://github.com/citizenfx/screenshot-basic),
 the tablet can instead capture a photo of a citizen's character automatically
 the first time they load in, so most profiles already have a picture before
-staff ever open the tablet:
+anyone opens the tablet:
 
 ```lua
 Config.AutoPhoto = {
@@ -230,7 +239,7 @@ Config.AutoPhoto = {
 
 Set `Config.AutoPhoto.Webhook` to a Discord webhook URL to enable it — with
 it left blank, or `screenshot-basic` not running, this feature silently does
-nothing and staff can still set photos manually from the tablet. Captured
+nothing and photos can still be set manually from the tablet. Captured
 photos are written to `gt_citizen_photos` with `is_auto = 1`; manually-set
 photos always use `is_auto = 0` and are never overwritten by an auto-capture
 once set.
@@ -282,8 +291,8 @@ like.
 Flags land in the **High Risk Payments** tab (gated behind the
 `viewHighRisk` permission) showing the citizen, account number, amount,
 category, full reason string and timestamp, and are pushed live via NUI to
-every online staff member who can see them — no refresh needed. Staff can
-mark a flag Reviewed or Dismiss it.
+every online government-job character who can see them — no refresh
+needed. They can mark a flag Reviewed or Dismiss it.
 
 Other resources can also raise a flag explicitly, regardless of amount or
 keywords:
@@ -295,7 +304,7 @@ exports['pv-govtablet']:FlagHighRiskTransaction(citizenid, 'manual', 50000, 'ban
 ### Businesses
 
 `Config.Businesses` maps `QBCore.Shared.Jobs` keys to a tablet-visible
-business profile. Staff roster, grades and pay are read live from
+business profile. The employee roster, grades and pay are read live from
 `QBCore.Shared.Jobs` and the `players` table — nothing needs to be kept in
 sync manually:
 
@@ -343,8 +352,8 @@ in **Account Lookup**.
 Every citizen and every configured business has exactly one bank account
 number, minted automatically the first time it's needed and stored in
 `gt_bank_accounts`. The **Account Lookup** tab (gated behind the
-`viewAccountLookup` permission) lets staff search any account number and see
-the owner, live balance(s) and full transaction history — the same
+`viewAccountLookup` permission) lets a tablet user search any account
+number and see the owner, live balance(s) and full transaction history — the same
 underlying ledger (`gt_transactions`) that powers both citizen financial
 history and the Businesses tab.
 
@@ -358,7 +367,7 @@ history and the Businesses tab.
   whitelisted patterns before being used anywhere.
 - A sliding-window rate limit (`Config.MaxActionsPerMinute`) and a search
   cooldown (`Config.SearchCooldown`) blunt event-spam/exploit attempts.
-- Every action is written to `gt_logs` (staff name, job, action, target
+- Every action is written to `gt_logs` (character name, job, action, target
   citizen, details, timestamp) and optionally mirrored to Discord.
 
 ## File structure

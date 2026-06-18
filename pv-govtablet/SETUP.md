@@ -50,7 +50,7 @@ This is the most important step. Open `pv-govtablet/config.lua` and find
 - `minGrade` is the lowest grade level (rank) in that job allowed to use
   the tablet. `0` means everyone in that job.
 
-## ☐ 5. Decide how staff open the tablet
+## ☐ 5. Decide how players with these jobs open the tablet
 
 Still in `config.lua`:
 
@@ -66,7 +66,7 @@ If you want the item option, add it to `qb-core/shared/items.lua`:
 ['gov_tablet'] = { name = 'gov_tablet', label = 'Government Tablet', weight = 500, type = 'item', image = 'gov_tablet.png', unique = true, useable = true, shouldClose = true, description = 'Secure government access terminal' },
 ```
 
-Then give it to staff (starting loadout, a shop, or `/giveitem yourname gov_tablet 1` for testing) and drop a `gov_tablet.png` into your inventory resource's image folder.
+Then give it to characters in those jobs (starting loadout, a shop, or `/giveitem yourname gov_tablet 1` for testing) and drop a `gov_tablet.png` into your inventory resource's image folder.
 
 If you don't care about the item, just leave `Config.UseItem = false` and
 use the `/govtablet` command instead — nothing else to do.
@@ -109,7 +109,7 @@ actually want on the tablet.
 
 ## ☐ 9. (Recommended) Hook up business deposits/withdrawals
 
-By default the Businesses tab will show the live balance and staff roster
+By default the Businesses tab will show the live balance and employee roster
 correctly, but the "money in/out" history will be empty until your
 boss-menu/society script tells the tablet when money moves. Find wherever
 your boss menu handles deposits/withdrawals and add:
@@ -168,7 +168,7 @@ Config.AutoPhoto = {
 ```
 
 If you don't have `screenshot-basic` or don't want this, set
-`Config.AutoPhoto.Enabled = false` — staff can still set photos by hand from
+`Config.AutoPhoto.Enabled = false` — photos can still be set by hand from
 the tablet.
 
 ## ☐ 13. Restart and test
