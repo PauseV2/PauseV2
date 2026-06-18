@@ -204,6 +204,8 @@ button.action-btn.warn { background: var(--warn-soft); color: var(--warn); borde
 }
 .primary-btn:hover { filter: brightness(1.1); }
 
+.section-title { font-size: 14px; font-weight: 700; margin: 26px 0 12px; color: var(--text-1); text-transform: uppercase; letter-spacing: 0.4px; }
+
 /* Lists */
 .list { display: flex; flex-direction: column; gap: 10px; }
 .list-item {

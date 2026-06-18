@@ -31,10 +31,13 @@ server_scripts {
     '@oxmysql/lib/MySQL.lua',
     'server/sv_main.lua',
     'server/sv_logs.lua',
+    'server/sv_riskmonitor.lua',
     'bridge/sv_banking.lua',
     'bridge/sv_housing.lua',
     'bridge/sv_garage.lua',
-    'bridge/sv_police.lua'
+    'bridge/sv_police.lua',
+    'bridge/sv_accounts.lua',
+    'bridge/sv_business.lua'
 }
 
 dependencies {

@@ -27,6 +27,10 @@ function Utils.SanitizeString(str, maxLen)
     return str
 end
 
+function Utils.IsValidAccountNumber(n)
+    return type(n) == 'string' and #n >= 6 and #n <= 20 and n:match('^%d+$') ~= nil
+end
+
 function Utils.IsPositiveNumber(n)
     return type(n) == 'number' and n > 0 and n == n and n ~= math.huge
 end

@@ -17,10 +17,19 @@ ever hides/shows buttons for convenience — it has no authority of its own.
 - Property seizure and restoration (fully reversible)
 - Criminal record viewing + adding convictions
 - Judge approval queue for seizures (configurable)
+- **High Risk Payments** tab — large vehicle purchases and unexplained bank/crypto
+  deposits are flagged automatically the instant the money moves, with full
+  what/when/how detail, and pushed live to every online staff member who can see them
+- **Businesses** tab — staff roster, grades, pay and live account balance for
+  every configured business, with deposit/withdrawal history and a direct
+  link to that business's bank account
+- **Account Lookup** tab — search any citizen or business account number to
+  see its complete transaction history
 - Full audit log, with optional Discord webhook mirroring
 - Config-driven job/grade permission matrix
-- Bridge layer so it talks to your housing/garage/police resources without
-  hard dependencies
+- Bridge layer so it talks to your housing/garage/banking/business resources
+  without hard dependencies, with everything synced live to the database so
+  every staff member sees the same state instantly
 
 ## Requirements
 
@@ -220,6 +229,101 @@ end
 Also exported: `IsAccountHidden(citizenid, accountType)` and
 `GetBalances(citizenid)`.
 
+### High Risk Payments
+
+Every bank/crypto change on a player's QBCore money object already flows
+through `QBCore:Server:OnMoneyChange` — `server/sv_riskmonitor.lua` hooks
+that single event, so nothing else needs to call into the tablet for this
+to work. Every change is logged to that citizen's ledger automatically, and
+screened in real time against `Config.HighRiskPayments`:
+
+```lua
+Config.HighRiskPayments = {
+    Enabled          = true,
+    DepositThreshold = 900000,  -- unexplained incoming deposit >= this amount gets flagged
+    VehicleThreshold = 400000,  -- outgoing payment >= this amount tagged as a vehicle purchase gets flagged
+    VehicleReasonKeywords = { 'vehicle', 'showroom', 'dealership' }, -- substrings of the `reason` your vehicle shop passes to RemoveMoney
+    IgnoreReasonKeywords  = { 'paycheck', 'salary', 'gov-tablet' },  -- reasons that are NEVER flagged, however large
+}
+```
+
+Adjust `VehicleReasonKeywords` to match whatever string your vehicle
+shop/dealership resource passes as the `reason` argument when it calls
+`Player.Functions.RemoveMoney`. Any large deposit whose reason isn't on the
+`IgnoreReasonKeywords` list gets flagged regardless of where it actually came
+from — this is what catches money of unknown origin (e.g. drug sales)
+without needing to know what every illicit money-maker on your server looks
+like.
+
+Flags land in the **High Risk Payments** tab (gated behind the
+`viewHighRisk` permission) showing the citizen, account number, amount,
+category, full reason string and timestamp, and are pushed live via NUI to
+every online staff member who can see them — no refresh needed. Staff can
+mark a flag Reviewed or Dismiss it.
+
+Other resources can also raise a flag explicitly, regardless of amount or
+keywords:
+
+```lua
+exports['pv-govtablet']:FlagHighRiskTransaction(citizenid, 'manual', 50000, 'bank', 'Reported by qb-drugs: suspected laundering')
+```
+
+### Businesses
+
+`Config.Businesses` maps `QBCore.Shared.Jobs` keys to a tablet-visible
+business profile. Staff roster, grades and pay are read live from
+`QBCore.Shared.Jobs` and the `players` table — nothing needs to be kept in
+sync manually:
+
+```lua
+Config.Businesses = {
+    ['mechanic']   = { label = 'Bennys Motorworks' },
+    ['realestate'] = { label = 'Dynasty 8 Real Estate' },
+    ['tax']        = { label = 'Tax Agency' },
+}
+```
+
+The live balance shown is read from `Config.Bridge.Business`, which assumes
+qb-management's default `management_funds` schema:
+
+```lua
+Config.Bridge.Business = {
+    FundsTable  = 'management_funds',
+    JobField    = 'job_name',
+    AmountField = 'amount',
+}
+```
+
+Adjust the table/column names if your society-money resource differs
+(qb-banking job accounts, a custom boss-menu, etc). If the configured table
+doesn't exist on your server, businesses simply show a $0 balance instead of
+erroring.
+
+Deposit/withdrawal history is **not** something QBCore tracks anywhere by
+default for society accounts, so the tablet keeps its own ledger that only
+fills in once your boss-menu/society script calls the
+`RecordBusinessTransaction` export whenever money actually moves in or out:
+
+```lua
+exports['pv-govtablet']:RecordBusinessTransaction('mechanic', 'in', 2500, 'sale', 'Vehicle repair - Michael De Santa')
+exports['pv-govtablet']:RecordBusinessTransaction('mechanic', 'out', 1200, 'payroll', 'Weekly payroll run')
+```
+
+Every business automatically gets a stable bank account number the first
+time it's viewed — clicking a business in the **Businesses** tab shows that
+account number and links straight through to its full transaction history
+in **Account Lookup**.
+
+### Account Lookup
+
+Every citizen and every configured business has exactly one bank account
+number, minted automatically the first time it's needed and stored in
+`gt_bank_accounts`. The **Account Lookup** tab (gated behind the
+`viewAccountLookup` permission) lets staff search any account number and see
+the owner, live balance(s) and full transaction history — the same
+underlying ledger (`gt_transactions`) that powers both citizen financial
+history and the Businesses tab.
+
 ## Security notes
 
 - Every read/write callback re-validates the caller's job, grade, and the
@@ -244,10 +348,13 @@ pv-govtablet/
 ├── client/cl_photo.lua        -- automatic citizen photo capture (optional)
 ├── server/sv_main.lua         -- permissions, callbacks, orchestration
 ├── server/sv_logs.lua         -- audit logging + Discord webhook
+├── server/sv_riskmonitor.lua  -- high-risk payment detection (OnMoneyChange hook)
 ├── bridge/sv_banking.lua      -- money/freeze integration
 ├── bridge/sv_housing.lua      -- houses/apartments integration
 ├── bridge/sv_garage.lua       -- vehicles integration
 ├── bridge/sv_police.lua       -- criminal records integration
+├── bridge/sv_accounts.lua     -- canonical account registry + transaction ledger
+├── bridge/sv_business.lua     -- business roster/balance integration
 ├── sql/install.sql
 └── html/                      -- NUI (index.html, css/style.css, js/app.js)
 ```

@@ -42,6 +42,13 @@ RegisterNetEvent('pv-govtablet:client:open', function(accessData)
     openTablet(accessData)
 end)
 
+-- Live push when the server flags a high-risk payment, so any open
+-- tablet's High Risk tab updates instantly without polling.
+RegisterNetEvent('pv-govtablet:client:highRiskFlag', function(flagRow)
+    if not tabletOpen then return end
+    SendNUIMessage({ action = 'highRiskFlag', flag = flagRow })
+end)
+
 -- ============================================================
 -- NUI <-> server bridge
 -- A small generic forwarder keeps this file short: the NUI posts
@@ -68,6 +75,11 @@ local forwardableEvents = {
     'resolveApproval',
     'setPhoto',
     'getLogs',
+    'getHighRiskFlags',
+    'resolveHighRiskFlag',
+    'getBusinesses',
+    'getBusinessProfile',
+    'lookupAccount',
 }
 
 for _, evt in ipairs(forwardableEvents) do

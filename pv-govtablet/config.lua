@@ -40,6 +40,41 @@ Config.AutoPhoto = {
 -- realistic way to know how much physical cash someone is carrying.
 Config.MoneyTypes = { 'bank', 'crypto' }
 
+-- High-risk payment detection. Every bank/crypto change on the QBCore
+-- player object is recorded as a transaction (see Config.Bridge below and
+-- bridge/sv_accounts.lua) and screened against these thresholds in real
+-- time via the `QBCore:Server:OnMoneyChange` event - no polling involved,
+-- so flags appear the instant the money moves and are pushed live to any
+-- staff member with the `viewHighRisk` permission and the tablet open.
+-- Other resources (drug systems, money laundering scripts, custom vehicle
+-- shops, etc.) can also flag something explicitly regardless of amount via
+-- exports['pv-govtablet']:FlagHighRiskTransaction(...) - see README.md.
+Config.HighRiskPayments = {
+    Enabled          = true,
+    DepositThreshold = 900000,  -- single bank/crypto deposit >= this amount with no recognized source gets flagged
+    VehicleThreshold = 400000,  -- single bank/crypto withdrawal >= this amount tagged as a vehicle purchase gets flagged
+    -- Substrings (case-insensitive) of the `reason` argument QBCore passes
+    -- to OnMoneyChange that identify a withdrawal as a vehicle purchase.
+    -- Adjust to match whatever vehicle shop resource your server runs.
+    VehicleReasonKeywords = { 'vehicle', 'showroom', 'dealership' },
+    -- Substrings that are NEVER flagged even over threshold (legitimate,
+    -- predictable income/expenses you don't want cluttering the queue).
+    IgnoreReasonKeywords = { 'paycheck', 'salary', 'gov-tablet' },
+}
+
+-- Businesses tab. Each entry maps a QBCore.Shared.Jobs key to a
+-- tablet-visible business profile. Staff roster, grades and pay are read
+-- live from QBCore.Shared.Jobs and the `players` table - nothing here
+-- needs to be duplicated. The linked bank account's live balance comes
+-- from Config.Bridge.Business below; its deposit/withdrawal history only
+-- populates once your boss-menu/society script calls the
+-- `RecordBusinessTransaction` export - see README.md.
+Config.Businesses = {
+    ['mechanic']   = { label = 'Bennys Motorworks' },
+    ['realestate'] = { label = 'Dynasty 8 Real Estate' },
+    ['tax']        = { label = 'Tax Agency' },
+}
+
 -- Job / role permission matrix. `minGrade` is the minimum job grade level
 -- required, `permissions` controls which actions that job is allowed to
 -- perform. All of this is re-validated server side on every request.
@@ -67,6 +102,9 @@ Config.Jobs = {
             restoreProperty = true,
             approveSeizure  = true,
             viewLogs        = true,
+            viewHighRisk    = true,
+            viewBusinesses  = true,
+            viewAccountLookup = true,
         }
     },
     ['tax'] = {
@@ -92,6 +130,9 @@ Config.Jobs = {
             restoreProperty = false,
             approveSeizure  = false,
             viewLogs        = true,
+            viewHighRisk    = true,
+            viewBusinesses  = true,
+            viewAccountLookup = true,
         }
     },
     ['government'] = {
@@ -117,6 +158,9 @@ Config.Jobs = {
             restoreProperty = false,
             approveSeizure  = false,
             viewLogs        = false,
+            viewHighRisk    = false,
+            viewBusinesses  = true,
+            viewAccountLookup = false,
         }
     },
     ['doj'] = {
@@ -142,6 +186,9 @@ Config.Jobs = {
             restoreProperty = true,
             approveSeizure  = false,
             viewLogs        = true,
+            viewHighRisk    = true,
+            viewBusinesses  = false,
+            viewAccountLookup = true,
         }
     },
     ['judge'] = {
@@ -167,6 +214,9 @@ Config.Jobs = {
             restoreProperty = false,
             approveSeizure  = true,
             viewLogs        = true,
+            viewHighRisk    = false,
+            viewBusinesses  = false,
+            viewAccountLookup = true,
         }
     },
 }
@@ -186,5 +236,16 @@ Config.Bridge = {
         PlateField    = 'plate',
         StateField    = 'state',           -- 0 = out, 1 = garage, 2 = impound
         ModelField    = 'vehicle',
+    },
+    -- Society/business balance table. qb-management's default schema is
+    -- assumed here; adjust to match your society-money resource
+    -- (qb-banking job accounts, qb-bossmenu, etc). If the table doesn't
+    -- exist, businesses just show a $0 balance instead of erroring -
+    -- deposit/withdrawal history still works via the RecordBusinessTransaction
+    -- export regardless of whether this table is found.
+    Business = {
+        FundsTable  = 'management_funds',
+        JobField    = 'job_name',
+        AmountField = 'amount',
     },
 }

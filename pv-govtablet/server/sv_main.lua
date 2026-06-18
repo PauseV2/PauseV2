@@ -522,6 +522,74 @@ QBCore.Functions.CreateCallback('pv-govtablet:server:getLogs', function(source, 
 end)
 
 -- ============================================================
+-- High-risk payments
+-- ============================================================
+
+QBCore.Functions.CreateCallback('pv-govtablet:server:getHighRiskFlags', function(source, cb, statusFilter)
+    local staff = getStaffContext(source)
+    if not staff or not hasPermission(staff, 'viewHighRisk') then return cb(false, 'no_permission') end
+
+    local validFilters = { open = true, reviewed = true, dismissed = true, all = true }
+    if statusFilter and not validFilters[statusFilter] then statusFilter = 'open' end
+
+    cb(true, RiskMonitor.GetFlags(statusFilter or 'open'))
+end)
+
+QBCore.Functions.CreateCallback('pv-govtablet:server:resolveHighRiskFlag', function(source, cb, flagId, status)
+    local staff = getStaffContext(source)
+    if not staff or not hasPermission(staff, 'viewHighRisk') then return cb(false, 'no_permission') end
+
+    flagId = tonumber(flagId)
+    if not flagId then return cb(false, 'invalid_id') end
+
+    local success, err = RiskMonitor.ResolveFlag(flagId, status, staff.name)
+    if success then
+        Logger.Add({ citizenid = staff.citizenid, name = staff.name, job = staff.job }, status == 'dismissed' and 'dismiss_flag' or 'review_flag', nil, ('Flag #%d'):format(flagId))
+    end
+    cb(success, err)
+end)
+
+-- ============================================================
+-- Businesses
+-- ============================================================
+
+QBCore.Functions.CreateCallback('pv-govtablet:server:getBusinesses', function(source, cb)
+    local staff = getStaffContext(source)
+    if not staff or not hasPermission(staff, 'viewBusinesses') then return cb(false, 'no_permission') end
+
+    cb(true, Business.List())
+end)
+
+QBCore.Functions.CreateCallback('pv-govtablet:server:getBusinessProfile', function(source, cb, jobKey)
+    local staff = getStaffContext(source)
+    if not staff or not hasPermission(staff, 'viewBusinesses') then return cb(false, 'no_permission') end
+    if not Config.Businesses[jobKey] then return cb(false, 'unknown_business') end
+
+    local profile = Business.GetProfile(jobKey)
+    if not profile then return cb(false, 'not_found') end
+
+    Logger.Add({ citizenid = staff.citizenid, name = staff.name, job = staff.job }, 'view_business', nil, jobKey)
+    cb(true, profile)
+end)
+
+-- ============================================================
+-- Account lookup
+-- ============================================================
+
+QBCore.Functions.CreateCallback('pv-govtablet:server:lookupAccount', function(source, cb, accountNumber)
+    local staff = getStaffContext(source)
+    if not staff or not hasPermission(staff, 'viewAccountLookup') then return cb(false, 'no_permission') end
+    if isRateLimited(source) then return cb(false, 'rate_limited') end
+    if not Utils.IsValidAccountNumber(accountNumber) then return cb(false, 'invalid_account_number') end
+
+    local result = Accounts.Lookup(accountNumber)
+    if not result then return cb(false, 'not_found') end
+
+    Logger.Add({ citizenid = staff.citizenid, name = staff.name, job = staff.job }, 'lookup_account', result.citizenid, accountNumber)
+    cb(true, result)
+end)
+
+-- ============================================================
 -- Tablet open trigger (item use)
 -- ============================================================
 

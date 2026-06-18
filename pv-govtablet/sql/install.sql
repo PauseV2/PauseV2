@@ -139,3 +139,57 @@ CREATE TABLE IF NOT EXISTS `gt_seizure_requests` (
     `resolved_at` DATETIME DEFAULT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Unified account registry. Every citizen and every configured business
+-- (Config.Businesses) gets exactly one row here with a stable, randomly
+-- generated account number - this is what the Account Lookup tab searches
+-- on, and what the Businesses tab links out to.
+CREATE TABLE IF NOT EXISTS `gt_bank_accounts` (
+    `account_number` VARCHAR(20) NOT NULL,
+    `owner_type` ENUM('citizen','business') NOT NULL,
+    `owner_id` VARCHAR(50) NOT NULL,
+    `label` VARCHAR(150) DEFAULT NULL,
+    `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`account_number`),
+    UNIQUE KEY `idx_owner` (`owner_type`, `owner_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Canonical transaction ledger. Every bank/crypto change on a citizen's
+-- QBCore money object is recorded here automatically (via
+-- QBCore:Server:OnMoneyChange in server/sv_riskmonitor.lua), and business
+-- transactions are recorded whenever the RecordBusinessTransaction export
+-- is called. This single table powers the Account Lookup tab for both
+-- citizens and businesses, and is what high-risk detection screens.
+CREATE TABLE IF NOT EXISTS `gt_transactions` (
+    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `account_number` VARCHAR(20) NOT NULL,
+    `direction` ENUM('in','out') NOT NULL,
+    `amount` DECIMAL(15,2) NOT NULL,
+    `balance_after` DECIMAL(15,2) DEFAULT NULL,
+    `account_type` VARCHAR(20) DEFAULT NULL,
+    `category` VARCHAR(50) DEFAULT NULL,
+    `reason` VARCHAR(255) DEFAULT NULL,
+    `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    KEY `idx_account` (`account_number`, `created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- High-risk payment flags raised automatically against
+-- Config.HighRiskPayments thresholds, or manually via the
+-- FlagHighRiskTransaction export.
+CREATE TABLE IF NOT EXISTS `gt_high_risk_flags` (
+    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `citizenid` VARCHAR(50) NOT NULL,
+    `account_number` VARCHAR(20) DEFAULT NULL,
+    `category` ENUM('large_deposit','vehicle_purchase','manual') NOT NULL DEFAULT 'manual',
+    `amount` DECIMAL(15,2) NOT NULL DEFAULT 0,
+    `account_type` VARCHAR(20) DEFAULT NULL,
+    `reason` VARCHAR(255) DEFAULT NULL,
+    `details` TEXT DEFAULT NULL,
+    `status` ENUM('open','reviewed','dismissed') NOT NULL DEFAULT 'open',
+    `reviewed_by` VARCHAR(100) DEFAULT NULL,
+    `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    KEY `idx_citizen` (`citizenid`),
+    KEY `idx_status` (`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

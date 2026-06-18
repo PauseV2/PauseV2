@@ -113,6 +113,8 @@
 
     if (view === 'approvals') loadApprovals();
     if (view === 'logs') loadLogs();
+    if (view === 'highrisk') loadHighRisk();
+    if (view === 'businesses') loadBusinesses();
   }
 
   function setTab(tab) {
@@ -127,7 +129,10 @@
     if (navItem && !navItem.disabled) setView(navItem.dataset.view);
 
     const tabBtn = e.target.closest('.tab-btn');
-    if (tabBtn) setTab(tabBtn.dataset.tab);
+    if (tabBtn && tabBtn.dataset.tab) setTab(tabBtn.dataset.tab);
+
+    const hrFilterBtn = e.target.closest('#highRiskFilterTabs .tab-btn');
+    if (hrFilterBtn) loadHighRisk(hrFilterBtn.dataset.hrFilter);
   });
 
   // ============================================================
@@ -532,6 +537,183 @@
   }
 
   // ============================================================
+  // Shared transaction list renderer (Businesses + Account Lookup)
+  // ============================================================
+
+  function renderTransactionList(el, transactions) {
+    if (!transactions || !transactions.length) { el.innerHTML = `<div class="empty-state">No transactions recorded yet.</div>`; return; }
+
+    el.innerHTML = transactions.map(t => `
+      <div class="list-item">
+        <div class="list-item-main">
+          <div class="list-item-title">
+            <span class="pill ${t.direction === 'in' ? 'active-pill' : 'frozen'}">${t.direction === 'in' ? 'IN' : 'OUT'}</span>
+            $${Number(t.amount).toLocaleString()}
+            ${t.category ? `<span class="tag">${t.category}</span>` : ''}
+          </div>
+          <div class="list-item-sub">${t.reason || 'No reason given'} &middot; Balance after: $${Number(t.balance_after || 0).toLocaleString()}</div>
+        </div>
+        <div class="list-item-sub">${new Date(t.created_at).toLocaleString()}</div>
+      </div>
+    `).join('');
+  }
+
+  // ============================================================
+  // High Risk Payments
+  // ============================================================
+
+  let highRiskFilter = 'open';
+
+  const highRiskCategoryLabels = { large_deposit: 'Large Deposit', vehicle_purchase: 'Vehicle Purchase', manual: 'Manual Flag' };
+
+  async function loadHighRisk(filter) {
+    highRiskFilter = filter || highRiskFilter;
+    document.querySelectorAll('#highRiskFilterTabs .tab-btn').forEach(b => b.classList.toggle('active', b.dataset.hrFilter === highRiskFilter));
+
+    const list = document.getElementById('highRiskList');
+    const res = await post('getHighRiskFlags', [highRiskFilter]);
+    if (!res.success) { list.innerHTML = `<div class="empty-state">${friendlyError(res.data)}</div>`; return; }
+    if (!res.data.length) { list.innerHTML = `<div class="empty-state">No flagged payments.</div>`; return; }
+
+    list.innerHTML = res.data.map(f => {
+      const statusPill = f.status === 'open' ? '<span class="pill frozen">Open</span>'
+        : f.status === 'reviewed' ? '<span class="pill active-pill">Reviewed</span>'
+        : '<span class="pill hidden-pill">Dismissed</span>';
+
+      let actions = '';
+      if (f.status === 'open') {
+        actions = `<button class="action-btn success" data-act="reviewed" data-id="${f.id}">Mark Reviewed</button>
+          <button class="action-btn" data-act="dismissed" data-id="${f.id}">Dismiss</button>`;
+      }
+
+      return `<div class="list-item">
+        <div class="list-item-main">
+          <div class="list-item-title">${highRiskCategoryLabels[f.category] || f.category} ${statusPill}</div>
+          <div class="list-item-sub">Citizen: ${f.citizenid} &middot; Account: ${f.account_number || 'N/A'} (${f.account_type || '?'}) &middot; $${Number(f.amount).toLocaleString()}</div>
+          <div class="list-item-sub">${f.reason || 'No reason given'} &middot; ${new Date(f.created_at).toLocaleString()}</div>
+        </div>
+        <div class="list-item-actions">${actions}</div>
+      </div>`;
+    }).join('');
+
+    list.querySelectorAll('button[data-act]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const res2 = await post('resolveHighRiskFlag', [btn.dataset.id, btn.dataset.act]);
+        if (res2.success) { toast('Flag updated.', 'success'); loadHighRisk(); }
+        else toast(friendlyError(res2.data), 'error');
+      });
+    });
+  }
+
+  // ============================================================
+  // Businesses
+  // ============================================================
+
+  async function loadBusinesses() {
+    document.getElementById('businessDetailWrap').classList.add('hidden');
+    document.getElementById('businessListWrap').classList.remove('hidden');
+
+    const list = document.getElementById('businessList');
+    const res = await post('getBusinesses', []);
+    if (!res.success) { list.innerHTML = `<div class="empty-state">${friendlyError(res.data)}</div>`; return; }
+    if (!res.data.length) { list.innerHTML = `<div class="empty-state">No businesses configured.</div>`; return; }
+
+    list.innerHTML = res.data.map(b => `
+      <div class="result-card" data-job="${b.job}">
+        <div>
+          <div class="result-name">${b.label}</div>
+          <div class="result-meta">Account ${b.accountNumber} &middot; ${b.staffCount} staff</div>
+        </div>
+        <div class="famount" style="font-size:18px;">$${Number(b.balance).toLocaleString()}</div>
+      </div>
+    `).join('');
+
+    list.querySelectorAll('.result-card').forEach(card => {
+      card.addEventListener('click', () => loadBusinessProfile(card.dataset.job));
+    });
+  }
+
+  async function loadBusinessProfile(jobKey) {
+    const res = await post('getBusinessProfile', [jobKey]);
+    if (!res.success) { toast(friendlyError(res.data), 'error'); return; }
+
+    const b = res.data;
+    document.getElementById('businessListWrap').classList.add('hidden');
+    document.getElementById('businessDetailWrap').classList.remove('hidden');
+    document.getElementById('businessDetailName').textContent = b.label;
+    document.getElementById('businessDetailAccount').textContent = b.accountNumber;
+
+    document.getElementById('businessDetailGrid').innerHTML = [
+      infoCard('Live Balance', `$${Number(b.balance).toLocaleString()}`),
+      infoCard('Staff Count', b.roster.length),
+      infoCard('Account Number', b.accountNumber, 'Use the button below to view full transaction history'),
+    ].join('');
+
+    const rosterList = document.getElementById('businessRosterList');
+    if (!b.roster.length) {
+      rosterList.innerHTML = `<div class="empty-state">No staff on record.</div>`;
+    } else {
+      rosterList.innerHTML = b.roster.map(s => `
+        <div class="list-item">
+          <div class="list-item-main">
+            <div class="list-item-title">${s.name} ${s.onDuty ? '<span class="pill active-pill">On Duty</span>' : ''}</div>
+            <div class="list-item-sub">${s.gradeLabel} (Grade ${s.gradeLevel})</div>
+          </div>
+          <div class="list-item-sub">$${Number(s.payment).toLocaleString()} / paycheck</div>
+        </div>
+      `).join('');
+    }
+
+    renderTransactionList(document.getElementById('businessTxnList'), b.transactions);
+
+    document.getElementById('viewBusinessAccountBtn').onclick = () => {
+      setView('accounts');
+      document.getElementById('accountSearchInput').value = b.accountNumber;
+      runAccountLookup();
+    };
+  }
+
+  document.getElementById('backToBusinessList').addEventListener('click', loadBusinesses);
+
+  // ============================================================
+  // Account Lookup
+  // ============================================================
+
+  async function runAccountLookup() {
+    const accountNumber = document.getElementById('accountSearchInput').value.trim();
+    const wrap = document.getElementById('accountResultWrap');
+    if (!accountNumber) { toast('Enter an account number.', 'error'); return; }
+
+    const res = await post('lookupAccount', [accountNumber]);
+    if (!res.success) {
+      wrap.classList.add('hidden');
+      toast(friendlyError(res.data), 'error');
+      return;
+    }
+
+    const a = res.data;
+    wrap.classList.remove('hidden');
+
+    const cards = [
+      infoCard('Account Number', a.accountNumber),
+      infoCard('Owner', a.label || 'Unknown'),
+      infoCard('Type', a.ownerType === 'citizen' ? 'Citizen' : 'Business'),
+    ];
+    if (a.ownerType === 'citizen' && a.balances) {
+      cards.push(infoCard('Bank Balance', `$${Number(a.balances.bank ? a.balances.bank.amount : 0).toLocaleString()}`));
+      cards.push(infoCard('Crypto Balance', `$${Number(a.balances.crypto ? a.balances.crypto.amount : 0).toLocaleString()}`));
+    } else if (typeof a.balance === 'number') {
+      cards.push(infoCard('Balance', `$${Number(a.balance).toLocaleString()}`));
+    }
+    document.getElementById('accountInfoGrid').innerHTML = cards.join('');
+
+    renderTransactionList(document.getElementById('accountTxnList'), a.transactions);
+  }
+
+  document.getElementById('accountSearchBtn').addEventListener('click', runAccountLookup);
+  document.getElementById('accountSearchInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') runAccountLookup(); });
+
+  // ============================================================
   // Lifecycle
   // ============================================================
 
@@ -553,6 +735,9 @@
       document.getElementById('roleLabel').textContent = msg.label || msg.job;
       document.getElementById('navApprovals').style.display = perm('approveSeizure') ? '' : 'none';
       document.getElementById('navLogs').style.display = perm('viewLogs') ? '' : 'none';
+      document.getElementById('navHighRisk').style.display = perm('viewHighRisk') ? '' : 'none';
+      document.getElementById('navBusinesses').style.display = perm('viewBusinesses') ? '' : 'none';
+      document.getElementById('navAccounts').style.display = perm('viewAccountLookup') ? '' : 'none';
 
       resetUI();
       document.getElementById('app').classList.remove('hidden');
@@ -561,6 +746,15 @@
     if (msg.action === 'close') {
       document.getElementById('app').classList.add('hidden');
       document.getElementById('modalOverlay').classList.add('hidden');
+    }
+
+    // Live push from server/sv_riskmonitor.lua the instant a payment is flagged.
+    if (msg.action === 'highRiskFlag') {
+      toast(`High-risk payment flagged: ${highRiskCategoryLabels[msg.flag.category] || msg.flag.category}`, 'error');
+      const highRiskView = document.getElementById('view-highrisk');
+      if (highRiskView.classList.contains('active') && (highRiskFilter === 'open' || highRiskFilter === 'all')) {
+        loadHighRisk();
+      }
     }
   });
 
