@@ -1,8 +1,32 @@
 # pv-govtablet — Government Tablet System
 
-A secure, QBCore-based tablet for high-authority jobs (Mayor, Tax Agency,
-Government, DOJ, Judges) to look up citizens and manage their financial,
-vehicle, property and criminal records.
+This is not just a staff lookup menu — it's a financial oversight system
+that changes how crime has to work on your server. Every dollar that moves
+through a player's bank or crypto account is watched in real time. If
+Jimmy is unemployed but is suddenly driving a $1.3 million supercar, has a
+business he can't explain, or just deposited $900,000 with no paycheck or
+sale behind it, the tablet already knows before staff even go looking —
+the **High Risk Payments** tab flags it the instant the money moves, with
+the exact amount, account, reason string and timestamp attached.
+
+That means money can no longer just disappear into a clean bank balance.
+A bank robbery, a drug deal, an illegal chip-dumping scheme through a
+front business — the second the cash lands or gets spent on something
+big, it's on the radar. The Tax Agency, Government and DOJ can trace it
+straight to the account, freeze it, seize it, and tie it to a criminal
+record, all from the same tablet. Players who want to launder money now
+have to actually launder it — spread it out, route it through a legitimate
+business, stay under the thresholds — instead of just walking up to an ATM.
+
+It cuts both ways: government and judicial roles get a real, provable
+paper trail to act on (and judges can require approval before a seizure
+goes through, so it can't be abused), while criminals who play it smart —
+small amounts, real cover stories, patience — can still stay under the
+radar. It raises the skill ceiling on crime instead of removing it.
+
+Built on QBCore, it also covers the more everyday staff workflows: citizen
+lookup, financial/vehicle/property management, business oversight and
+criminal records.
 
 Every action is validated and re-checked **server side**. The NUI only
 ever hides/shows buttons for convenience — it has no authority of its own.
