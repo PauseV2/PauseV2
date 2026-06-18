@@ -1,17 +1,17 @@
 import "./index.css";
 import { Composition } from "remotion";
-import { MyComposition } from "./Composition";
+import { Trailer, TRAILER_DURATION } from "./Trailer";
 
 export const RemotionRoot: React.FC = () => {
   return (
     <>
       <Composition
-        id="MyComp"
-        component={MyComposition}
-        durationInFrames={60}
+        id="Trailer"
+        component={Trailer}
+        durationInFrames={TRAILER_DURATION}
         fps={30}
-        width={1280}
-        height={720}
+        width={1920}
+        height={1080}
       />
     </>
   );
