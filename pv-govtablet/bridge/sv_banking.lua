@@ -7,7 +7,7 @@
     kept in its own overlay table (gt_account_freezes) so it survives
     independently of whatever banking script you run.
 
-    Cash on hand is deliberately not tracked here - government staff
+    Cash on hand is deliberately not tracked here - government officials
     have no realistic way to see physical cash a citizen is carrying,
     so it's excluded from Config.MoneyTypes entirely.
 
@@ -80,27 +80,27 @@ function Banking.GetBalances(citizenid)
     return balances
 end
 
-function Banking.SetFrozen(citizenid, accountType, frozen, reason, staffName)
+function Banking.SetFrozen(citizenid, accountType, frozen, reason, officialName)
     if not Utils.IsValidMoneyType(accountType) then return false end
 
     MySQL.query.await([[
         INSERT INTO gt_account_freezes (citizenid, account_type, frozen, reason, updated_by)
         VALUES (?, ?, ?, ?, ?)
         ON DUPLICATE KEY UPDATE frozen = ?, reason = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
-    ]], { citizenid, accountType, frozen and 1 or 0, reason, staffName, frozen and 1 or 0, reason, staffName })
+    ]], { citizenid, accountType, frozen and 1 or 0, reason, officialName, frozen and 1 or 0, reason, officialName })
 
     loadFreezeState(citizenid)
     return true
 end
 
-function Banking.SetHidden(citizenid, accountType, hidden, staffName)
+function Banking.SetHidden(citizenid, accountType, hidden, officialName)
     if not Utils.IsValidMoneyType(accountType) then return false end
 
     MySQL.query.await([[
         INSERT INTO gt_account_freezes (citizenid, account_type, hidden, updated_by)
         VALUES (?, ?, ?, ?)
         ON DUPLICATE KEY UPDATE hidden = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
-    ]], { citizenid, accountType, hidden and 1 or 0, staffName, hidden and 1 or 0, staffName })
+    ]], { citizenid, accountType, hidden and 1 or 0, officialName, hidden and 1 or 0, officialName })
 
     loadFreezeState(citizenid)
     return true
@@ -109,7 +109,7 @@ end
 -- Removes `amount` from the citizen's account, online or offline,
 -- and records the seizure for audit purposes. Returns false if the
 -- citizen does not have sufficient funds.
-function Banking.SeizeFunds(citizenid, accountType, amount, reason, staffName)
+function Banking.SeizeFunds(citizenid, accountType, amount, reason, officialName)
     if not Utils.IsValidMoneyType(accountType) or not Utils.IsPositiveNumber(amount) then
         return false, 'invalid_input'
     end
@@ -135,7 +135,7 @@ function Banking.SeizeFunds(citizenid, accountType, amount, reason, staffName)
     MySQL.insert.await([[
         INSERT INTO gt_fund_seizures (citizenid, account_type, amount, reason, seized_by)
         VALUES (?, ?, ?, ?, ?)
-    ]], { citizenid, accountType, amount, reason, staffName })
+    ]], { citizenid, accountType, amount, reason, officialName })
 
     return true
 end

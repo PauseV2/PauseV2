@@ -23,7 +23,7 @@ local actionColors = {
     deny_request    = 10038562,
 }
 
-local function sendWebhook(staffName, staffJob, action, targetCitizenId, details)
+local function sendWebhook(officialName, officialJob, action, targetCitizenId, details)
     if not Config.Webhook or Config.Webhook == '' then return end
 
     local embed = {
@@ -31,8 +31,8 @@ local function sendWebhook(staffName, staffJob, action, targetCitizenId, details
             title = 'Government Tablet Action',
             color = actionColors[action] or 3447003,
             fields = {
-                { name = 'Staff', value = staffName, inline = true },
-                { name = 'Role', value = staffJob, inline = true },
+                { name = 'Official', value = officialName, inline = true },
+                { name = 'Role', value = officialJob, inline = true },
                 { name = 'Action', value = action, inline = true },
                 { name = 'Target Citizen', value = targetCitizenId or 'N/A', inline = true },
                 { name = 'Details', value = details ~= '' and details or 'N/A' },
@@ -48,19 +48,19 @@ local function sendWebhook(staffName, staffJob, action, targetCitizenId, details
     }), { ['Content-Type'] = 'application/json' })
 end
 
--- staff = { citizenid, name, job }
-function Logger.Add(staff, action, targetCitizenId, details)
+-- official = { citizenid, name, job }
+function Logger.Add(official, action, targetCitizenId, details)
     details = details or ''
 
     MySQL.insert.await([[
-        INSERT INTO gt_logs (staff_citizenid, staff_name, staff_job, action, target_citizenid, details)
+        INSERT INTO gt_logs (official_citizenid, official_name, official_job, action, target_citizenid, details)
         VALUES (?, ?, ?, ?, ?, ?)
-    ]], { staff.citizenid, staff.name, staff.job, action, targetCitizenId, details })
+    ]], { official.citizenid, official.name, official.job, action, targetCitizenId, details })
 
-    sendWebhook(staff.name, staff.job, action, targetCitizenId, details)
+    sendWebhook(official.name, official.job, action, targetCitizenId, details)
 
     if Config.Debug then
-        print(('[pv-govtablet] %s (%s) -> %s on %s | %s'):format(staff.name, staff.job, action, targetCitizenId or 'N/A', details))
+        print(('[pv-govtablet] %s (%s) -> %s on %s | %s'):format(official.name, official.job, action, targetCitizenId or 'N/A', details))
     end
 end
 

@@ -1,7 +1,7 @@
 --[[
     Business bridge
     ----------------
-    Reads staff rosters and pay straight from QBCore.Shared.Jobs + the
+    Reads employee rosters and pay straight from QBCore.Shared.Jobs + the
     `players` table - that data already exists and is always live, so
     there's nothing to duplicate or fall out of sync.
 
@@ -80,7 +80,7 @@ function Business.List()
             label = bizCfg.label,
             accountNumber = accountNumber,
             balance = Business.GetLiveBalance(jobKey),
-            staffCount = #roster,
+            employeeCount = #roster,
         }
     end
     table.sort(list, function(a, b) return a.label < b.label end)

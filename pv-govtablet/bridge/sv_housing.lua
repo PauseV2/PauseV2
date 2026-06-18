@@ -67,7 +67,7 @@ function Housing.GetProperties(citizenid)
 end
 
 -- Removes the ownership row (if present) and snapshots it for restore.
-function Housing.SeizeProperty(citizenid, house, reason, staffName)
+function Housing.SeizeProperty(citizenid, house, reason, officialName)
     if not tableExists(cfg.HousesTable) then return false, 'no_housing_resource' end
 
     local row = MySQL.single.await(('SELECT * FROM `%s` WHERE `%s` = ? AND `%s` = ?'):format(cfg.HousesTable, cfg.CitizenField, cfg.HouseField), { citizenid, house })
@@ -76,7 +76,7 @@ function Housing.SeizeProperty(citizenid, house, reason, staffName)
     MySQL.insert.await([[
         INSERT INTO gt_property_seizures (house, citizenid, snapshot, seized, reason, seized_by)
         VALUES (?, ?, ?, 1, ?, ?)
-    ]], { house, citizenid, json.encode(row), reason, staffName })
+    ]], { house, citizenid, json.encode(row), reason, officialName })
 
     MySQL.query.await(('DELETE FROM `%s` WHERE `%s` = ? AND `%s` = ?'):format(cfg.HousesTable, cfg.CitizenField, cfg.HouseField), { citizenid, house })
 
@@ -84,7 +84,7 @@ function Housing.SeizeProperty(citizenid, house, reason, staffName)
 end
 
 -- Restores the most recent active seizure snapshot for this house/citizen.
-function Housing.RestoreProperty(citizenid, house, staffName)
+function Housing.RestoreProperty(citizenid, house, officialName)
     local seizure = MySQL.single.await([[
         SELECT * FROM gt_property_seizures
         WHERE house = ? AND citizenid = ? AND seized = 1
@@ -110,7 +110,7 @@ function Housing.RestoreProperty(citizenid, house, staffName)
 
     MySQL.insert.await(('INSERT INTO `%s` (%s) VALUES (%s)'):format(cfg.HousesTable, table.concat(columns, ', '), table.concat(placeholders, ', ')), values)
 
-    MySQL.update.await('UPDATE gt_property_seizures SET seized = 0, restored_at = CURRENT_TIMESTAMP, resolved_by = ? WHERE id = ?', { staffName, seizure.id })
+    MySQL.update.await('UPDATE gt_property_seizures SET seized = 0, restored_at = CURRENT_TIMESTAMP, resolved_by = ? WHERE id = ?', { officialName, seizure.id })
 
     return true
 end

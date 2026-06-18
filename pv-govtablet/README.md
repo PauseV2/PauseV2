@@ -1,13 +1,11 @@
 # pv-govtablet — Government Tablet System
 
-This is not an admin/staff (OOC) tool — it's an entirely in-character
-device, roleplayed by players whose **character** holds a government job
-(Mayor, Tax Agency, Government, DOJ, Police, Judges). No server staff or
-admin is involved in its use; it's the in-game equivalent of a government
-official pulling up someone's financial and legal file, and every action
-it takes is just that character doing their job.
+This is an entirely in-character device, roleplayed by players whose
+**character** holds a government job (Mayor, Tax Agency, Government, DOJ,
+Police, Judges) — the in-game equivalent of a government official pulling
+up someone's financial and legal file.
 
-It's also a financial oversight system that changes how crime has to work
+It's a financial oversight system that changes how crime has to work
 on your server. Every dollar that moves through a player's bank or crypto
 account is watched in real time. If Jimmy is unemployed but is suddenly
 driving a $1.3 million supercar, has a business he can't explain, or just

@@ -9,16 +9,16 @@
 
 CREATE TABLE IF NOT EXISTS `gt_logs` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `staff_citizenid` VARCHAR(50) NOT NULL,
-    `staff_name` VARCHAR(100) NOT NULL,
-    `staff_job` VARCHAR(50) NOT NULL,
+    `official_citizenid` VARCHAR(50) NOT NULL,
+    `official_name` VARCHAR(100) NOT NULL,
+    `official_job` VARCHAR(50) NOT NULL,
     `action` VARCHAR(50) NOT NULL,
     `target_citizenid` VARCHAR(50) DEFAULT NULL,
     `details` TEXT DEFAULT NULL,
     `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
     KEY `idx_target` (`target_citizenid`),
-    KEY `idx_staff` (`staff_citizenid`)
+    KEY `idx_official` (`official_citizenid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `gt_citizen_photos` (
@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS `gt_criminal_records` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Tracks frozen / hidden state of a citizen's money "accounts"
--- (bank / crypto - cash on hand isn't trackable by government staff).
+-- (bank / crypto - cash on hand isn't trackable by government officials).
 -- Read by the banking bridge and exported for other resources
 -- (e.g. qb-banking) to check before allowing a transaction.
 CREATE TABLE IF NOT EXISTS `gt_account_freezes` (

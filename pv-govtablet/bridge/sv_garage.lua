@@ -17,8 +17,8 @@
     they've physically impounded it - see README.md.
 
     The tablet's separate "impound" action is unrelated and still
-    immediate (it just flips the `state` column), for cases where staff
-    want to hold a vehicle directly without going through that flow.
+    immediate (it just flips the `state` column), for cases where an
+    official wants to hold a vehicle directly without going through that flow.
 ]]
 
 Garage = {}
@@ -70,34 +70,34 @@ function Garage.GetVehicles(citizenid)
     return vehicles
 end
 
-local function upsertSeizureRow(plate, citizenid, fields, staffName)
-    fields.updated_by = staffName
+local function upsertSeizureRow(plate, citizenid, fields, officialName)
+    fields.updated_by = officialName
     MySQL.query.await([[
         INSERT INTO gt_vehicle_seizures (plate, citizenid, seized, impounded, reason, updated_by)
         VALUES (?, ?, ?, ?, ?, ?)
         ON DUPLICATE KEY UPDATE seized = ?, impounded = ?, reason = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
     ]], {
         plate, citizenid,
-        fields.seized and 1 or 0, fields.impounded and 1 or 0, fields.reason, staffName,
-        fields.seized and 1 or 0, fields.impounded and 1 or 0, fields.reason, staffName,
+        fields.seized and 1 or 0, fields.impounded and 1 or 0, fields.reason, officialName,
+        fields.seized and 1 or 0, fields.impounded and 1 or 0, fields.reason, officialName,
     })
 end
 
 -- Flags the vehicle as seized WITHOUT touching its garage state - the
 -- owner keeps the car until police physically find it and resolve the
 -- seizure (see ResolveSeizure below).
-function Garage.SeizeVehicle(plate, reason, staffName)
+function Garage.SeizeVehicle(plate, reason, officialName)
     if not tableExists(cfg.VehicleTable) then return false, 'no_garage_resource' end
 
     local row = MySQL.single.await(('SELECT `%s` as citizenid FROM `%s` WHERE `%s` = ?'):format(cfg.CitizenField, cfg.VehicleTable, cfg.PlateField), { plate })
     if not row then return false, 'not_found' end
 
-    upsertSeizureRow(plate, row.citizenid, { seized = true, impounded = false, reason = reason }, staffName)
+    upsertSeizureRow(plate, row.citizenid, { seized = true, impounded = false, reason = reason }, officialName)
 
     return true
 end
 
-function Garage.ReleaseVehicle(plate, staffName)
+function Garage.ReleaseVehicle(plate, officialName)
     if not tableExists(cfg.VehicleTable) then return false, 'no_garage_resource' end
 
     local row = MySQL.single.await(('SELECT `%s` as citizenid FROM `%s` WHERE `%s` = ?'):format(cfg.CitizenField, cfg.VehicleTable, cfg.PlateField), { plate })
@@ -112,7 +112,7 @@ function Garage.ReleaseVehicle(plate, staffName)
         MySQL.update.await(('UPDATE `%s` SET `%s` = 1 WHERE `%s` = ?'):format(cfg.VehicleTable, cfg.StateField, cfg.PlateField), { plate })
     end
 
-    upsertSeizureRow(plate, row.citizenid, { seized = false, impounded = false, reason = nil }, staffName)
+    upsertSeizureRow(plate, row.citizenid, { seized = false, impounded = false, reason = nil }, officialName)
 
     return true
 end
@@ -144,7 +144,7 @@ function Garage.ResolveSeizure(plate, officerName)
     return true
 end
 
-function Garage.ImpoundVehicle(plate, reason, staffName)
+function Garage.ImpoundVehicle(plate, reason, officialName)
     if not tableExists(cfg.VehicleTable) then return false, 'no_garage_resource' end
 
     local owner = MySQL.single.await(('SELECT `%s` as citizenid FROM `%s` WHERE `%s` = ?'):format(cfg.CitizenField, cfg.VehicleTable, cfg.PlateField), { plate })
@@ -153,12 +153,12 @@ function Garage.ImpoundVehicle(plate, reason, staffName)
     local existing = MySQL.single.await('SELECT seized FROM gt_vehicle_seizures WHERE plate = ?', { plate })
 
     MySQL.update.await(('UPDATE `%s` SET `%s` = 2 WHERE `%s` = ?'):format(cfg.VehicleTable, cfg.StateField, cfg.PlateField), { plate })
-    upsertSeizureRow(plate, owner.citizenid, { seized = existing and existing.seized == 1 or false, impounded = true, reason = reason }, staffName)
+    upsertSeizureRow(plate, owner.citizenid, { seized = existing and existing.seized == 1 or false, impounded = true, reason = reason }, officialName)
 
     return true
 end
 
-function Garage.ReleaseImpound(plate, staffName)
+function Garage.ReleaseImpound(plate, officialName)
     if not tableExists(cfg.VehicleTable) then return false, 'no_garage_resource' end
 
     local owner = MySQL.single.await(('SELECT `%s` as citizenid FROM `%s` WHERE `%s` = ?'):format(cfg.CitizenField, cfg.VehicleTable, cfg.PlateField), { plate })
@@ -170,7 +170,7 @@ function Garage.ReleaseImpound(plate, staffName)
     -- Releasing the impound only lifts the impound hold; a separate asset
     -- seizure (if any) is left untouched and must be released on its own.
     MySQL.update.await(('UPDATE `%s` SET `%s` = ? WHERE `%s` = ?'):format(cfg.VehicleTable, cfg.StateField, cfg.PlateField), { stillSeized and 2 or 1, plate })
-    upsertSeizureRow(plate, owner.citizenid, { seized = stillSeized, impounded = stillSeized, reason = nil }, staffName)
+    upsertSeizureRow(plate, owner.citizenid, { seized = stillSeized, impounded = stillSeized, reason = nil }, officialName)
 
     return true
 end

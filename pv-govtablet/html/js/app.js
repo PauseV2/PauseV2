@@ -528,8 +528,8 @@
     list.innerHTML = res.data.map(l => `
       <div class="list-item">
         <div class="list-item-main">
-          <div class="list-item-title">${l.action} <span class="pill" style="background:var(--bg-3);color:var(--text-1);">${l.staff_job}</span></div>
-          <div class="list-item-sub">${l.staff_name} &middot; Target: ${l.target_citizenid || 'N/A'} &middot; ${l.details || ''}</div>
+          <div class="list-item-title">${l.action} <span class="pill" style="background:var(--bg-3);color:var(--text-1);">${l.official_job}</span></div>
+          <div class="list-item-sub">${l.official_name} &middot; Target: ${l.target_citizenid || 'N/A'} &middot; ${l.details || ''}</div>
         </div>
         <div class="list-item-sub">${new Date(l.created_at).toLocaleString()}</div>
       </div>
@@ -622,7 +622,7 @@
       <div class="result-card" data-job="${b.job}">
         <div>
           <div class="result-name">${b.label}</div>
-          <div class="result-meta">Account ${b.accountNumber} &middot; ${b.staffCount} staff</div>
+          <div class="result-meta">Account ${b.accountNumber} &middot; ${b.employeeCount} employees</div>
         </div>
         <div class="famount" style="font-size:18px;">$${Number(b.balance).toLocaleString()}</div>
       </div>
@@ -645,13 +645,13 @@
 
     document.getElementById('businessDetailGrid').innerHTML = [
       infoCard('Live Balance', `$${Number(b.balance).toLocaleString()}`),
-      infoCard('Staff Count', b.roster.length),
+      infoCard('Employee Count', b.roster.length),
       infoCard('Account Number', b.accountNumber, 'Use the button below to view full transaction history'),
     ].join('');
 
     const rosterList = document.getElementById('businessRosterList');
     if (!b.roster.length) {
-      rosterList.innerHTML = `<div class="empty-state">No staff on record.</div>`;
+      rosterList.innerHTML = `<div class="empty-state">No employees on record.</div>`;
     } else {
       rosterList.innerHTML = b.roster.map(s => `
         <div class="list-item">

@@ -18,7 +18,7 @@
         drug money looks like; anything large and unrecognized gets
         surfaced for a human to judge).
 
-    Flags are pushed live to every online staff member with the
+    Flags are pushed live to every online official with the
     `viewHighRisk` permission, the same way the judge-approval queue
     notifies judges in server/sv_main.lua.
 
@@ -53,7 +53,7 @@ local function matchesAny(haystack, keywords)
     return false
 end
 
-local function notifyStaff(flagRow)
+local function notifyOfficials(flagRow)
     local players = QBCore.Functions.GetQBPlayers()
     for _, Player in pairs(players) do
         local jobCfg = Config.Jobs[Player.PlayerData.job.name]
@@ -65,7 +65,7 @@ local function notifyStaff(flagRow)
     end
 end
 
--- Inserts a flag row and notifies staff. `accountNumber` may be nil if the
+-- Inserts a flag row and notifies officials. `accountNumber` may be nil if the
 -- caller doesn't have one handy - the citizen's account is resolved either way.
 function RiskMonitor.Flag(citizenid, category, amount, accountType, reason, accountNumber, details)
     if not Utils.IsValidCitizenId(citizenid) then return false, 'invalid_citizenid' end
@@ -97,7 +97,7 @@ function RiskMonitor.Flag(citizenid, category, amount, accountType, reason, acco
         details = details,
         status = 'open',
     }
-    notifyStaff(flagRow)
+    notifyOfficials(flagRow)
     return true
 end
 
@@ -108,13 +108,13 @@ function RiskMonitor.GetFlags(statusFilter)
     return MySQL.query.await('SELECT * FROM gt_high_risk_flags ORDER BY created_at DESC LIMIT 200') or {}
 end
 
-function RiskMonitor.ResolveFlag(flagId, status, staffName)
+function RiskMonitor.ResolveFlag(flagId, status, officialName)
     if status ~= 'reviewed' and status ~= 'dismissed' then return false, 'invalid_status' end
 
     local existing = MySQL.single.await("SELECT id FROM gt_high_risk_flags WHERE id = ? AND status = 'open'", { flagId })
     if not existing then return false, 'not_found' end
 
-    MySQL.update.await('UPDATE gt_high_risk_flags SET status = ?, reviewed_by = ? WHERE id = ?', { status, staffName, flagId })
+    MySQL.update.await('UPDATE gt_high_risk_flags SET status = ?, reviewed_by = ? WHERE id = ?', { status, officialName, flagId })
     return true
 end
 

@@ -18,11 +18,11 @@ Config.SearchResultLimit = 25
 Config.MaxActionsPerMinute = 20    -- generic write-action rate limit per player
 
 -- Seizures of funds/vehicles/properties can require a judge's approval
--- unless the acting staff member already holds the `approveSeizure` permission.
+-- unless the acting official already holds the `approveSeizure` permission.
 Config.RequireJudgeApproval = true
 
 -- Automatically captures a photo of each citizen's character (the model
--- they spawn in as) the first time they load in, so staff don't have to
+-- they spawn in as) the first time they load in, so officials don't have to
 -- manually set a photo URL. Requires the `screenshot-basic` resource
 -- (https://github.com/citizenfx/screenshot-basic) and a Discord webhook
 -- to upload the screenshot to - leave Webhook empty to disable and fall
@@ -36,7 +36,7 @@ Config.AutoPhoto = {
 }
 
 -- Money "accounts" tracked on the QBCore player object (PlayerData.money).
--- Cash on hand is intentionally excluded - government staff have no
+-- Cash on hand is intentionally excluded - government officials have no
 -- realistic way to know how much physical cash someone is carrying.
 Config.MoneyTypes = { 'bank', 'crypto' }
 
@@ -45,7 +45,7 @@ Config.MoneyTypes = { 'bank', 'crypto' }
 -- bridge/sv_accounts.lua) and screened against these thresholds in real
 -- time via the `QBCore:Server:OnMoneyChange` event - no polling involved,
 -- so flags appear the instant the money moves and are pushed live to any
--- staff member with the `viewHighRisk` permission and the tablet open.
+-- official with the `viewHighRisk` permission and the tablet open.
 -- Other resources (drug systems, money laundering scripts, custom vehicle
 -- shops, etc.) can also flag something explicitly regardless of amount via
 -- exports['pv-govtablet']:FlagHighRiskTransaction(...) - see README.md.
@@ -63,7 +63,7 @@ Config.HighRiskPayments = {
 }
 
 -- Businesses tab. Each entry maps a QBCore.Shared.Jobs key to a
--- tablet-visible business profile. Staff roster, grades and pay are read
+-- tablet-visible business profile. Employee roster, grades and pay are read
 -- live from QBCore.Shared.Jobs and the `players` table - nothing here
 -- needs to be duplicated. The linked bank account's live balance comes
 -- from Config.Bridge.Business below; its deposit/withdrawal history only

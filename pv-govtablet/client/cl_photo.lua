@@ -5,7 +5,7 @@
     in and uploads it via screenshot-basic to a Discord webhook, then
     saves the resulting CDN URL as that citizen's tablet photo. Entirely
     optional - if screenshot-basic isn't running or Config.AutoPhoto.Webhook
-    is left empty, this just does nothing and staff can still set a photo
+    is left empty, this just does nothing and a photo can still be set
     manually from the tablet.
 ]]
 
