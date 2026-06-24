@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>HUD</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="hud" class="hud-root">
+    <div id="weapon-panel" class="weapon-panel hidden">
+      <div class="weapon-icon">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6">
+          <path d="M2 14l3-3 9 1 2-2 4 1-1 4-2 2-9-1-3 3-2-2 2-2z" stroke-linejoin="round" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="weapon-info">
+        <span class="weapon-name" id="weapon-name">Weapon</span>
+        <span class="weapon-ammo" id="weapon-ammo">0 / 0</span>
+      </div>
+    </div>
+
+    <div class="status-wrap">
+      <div class="status-icon">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+          <path d="M12 21s-7.5-4.6-10-9.3C.6 8.3 2.3 5 5.6 5c2 0 3.4 1.1 4.4 2.5C11 6.1 12.4 5 14.4 5c3.3 0 5 3.3 3.6 6.7C19.5 16.4 12 21 12 21z"/>
+        </svg>
+      </div>
+      <div class="status-bar">
+        <div class="status-fill armor-fill" id="armor-fill"></div>
+        <div class="status-fill health-fill" id="health-fill"></div>
+      </div>
+    </div>
+
+    <div class="action-row">
+      <div class="action-btn" id="mic-btn" title="Voice">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8">
+          <rect x="9" y="2" width="6" height="11" rx="3"/>
+          <path d="M5 11a7 7 0 0014 0M12 18v3" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="action-btn" id="voice-btn" title="Voice range">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M4 9v6h3l5 4V5L7 9H4z" stroke-linejoin="round"/>
+          <path d="M16.5 8.5a5 5 0 010 7" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="action-btn" id="stamina-btn" title="Stamina">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M13 3l-6 9h5l-2 9 8-11h-5l2-7z" stroke-linejoin="round" stroke-linecap="round"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+<script src="app.js"></script>
+</body>
+</html>
