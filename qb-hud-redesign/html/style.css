@@ -23,7 +23,7 @@ html, body {
   flex-direction: column;
   gap: 10px;
   width: 280px;
-  color: #eef6f4;
+  color: #eceef5;
 }
 
 .hud-root.hidden {
@@ -35,8 +35,7 @@ html, body {
   display: flex;
   align-items: center;
   gap: 10px;
-  background: rgba(10, 18, 22, 0.72);
-  border: 1px solid rgba(61, 230, 196, 0.25);
+  background: rgba(16, 19, 28, 0.72);
   border-radius: 10px;
   padding: 8px 12px;
   backdrop-filter: blur(6px);
@@ -53,8 +52,8 @@ html, body {
   width: 28px;
   height: 28px;
   border-radius: 8px;
-  background: rgba(61, 230, 196, 0.12);
-  color: #3de6c4;
+  background: rgba(141, 168, 224, 0.14);
+  color: #8da8e0;
   flex-shrink: 0;
 }
 
@@ -67,18 +66,18 @@ html, body {
 .weapon-name {
   font-size: 12.5px;
   font-weight: 600;
-  color: #3de6c4;
+  color: #8da8e0;
   text-transform: capitalize;
 }
 
 .weapon-ammo {
   font-size: 12px;
   font-weight: 500;
-  color: #d7e8e4;
+  color: #d6daea;
   opacity: 0.85;
 }
 
-/* status bar */
+/* status bars */
 .status-wrap {
   display: flex;
   align-items: center;
@@ -91,7 +90,14 @@ html, body {
   justify-content: center;
   width: 18px;
   flex-shrink: 0;
-  color: #ff5d6c;
+}
+
+.health-icon {
+  color: #e8849a;
+}
+
+.armor-icon {
+  color: #8da8e0;
 }
 
 .status-bar {
@@ -99,8 +105,8 @@ html, body {
   flex: 1;
   height: 8px;
   border-radius: 6px;
-  background: rgba(8, 16, 20, 0.65);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(10, 13, 20, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.07);
   overflow: hidden;
 }
 
@@ -114,14 +120,11 @@ html, body {
 }
 
 .health-fill {
-  background: linear-gradient(90deg, #1fb88f, #3de6c4);
-  z-index: 2;
+  background: linear-gradient(90deg, #5fbe8a, #9ee6b8);
 }
 
 .armor-fill {
-  background: linear-gradient(90deg, #2a6cd6, #4fa3f7);
-  opacity: 0.55;
-  z-index: 1;
+  background: linear-gradient(90deg, #5b7fc4, #8da8e0);
 }
 
 /* action row */
@@ -137,14 +140,14 @@ html, body {
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  background: rgba(10, 18, 22, 0.72);
-  border: 1px solid rgba(61, 230, 196, 0.25);
-  color: #8fa3a0;
+  background: rgba(16, 19, 28, 0.72);
+  border: 1px solid rgba(141, 168, 224, 0.22);
+  color: #8b93a8;
   transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
 }
 
 .action-btn.active {
-  color: #0a1216;
-  background: #3de6c4;
-  border-color: #3de6c4;
+  color: #10131c;
+  background: #8da8e0;
+  border-color: #8da8e0;
 }
