@@ -45,15 +45,18 @@ Config.Cooldowns = {
     PerGarage          = 45 * 60,   -- seconds a single garage stays on cooldown after an attempt starts
     GlobalPerPlayer     = 4 * 60,   -- seconds a player must wait between starting ANY garage robbery
     StartCooldownOnEntry = true,    -- true = cooldown starts the moment the player breaches the garage, false = on exit/completion
-    SearchSpotReuse     = false,    -- if true, a looted spot can be searched again after the garage resets (next attempt), otherwise spots never re-roll within the same instance (always true per-instance)
 }
 
+-- A player can only ever be inside one robbery instance at a time
+-- (GarageRobbery.PlayerInstance is a single slot, not a list) and
+-- scrapping is always restricted to vehicles spawned for the player's
+-- own instance (instance.vehicles lookup in server/loot.lua) - these
+-- are structural invariants, not config toggles, since disabling
+-- either would reopen the anti-dupe/ownership holes they exist for.
 Config.AntiAbuse = {
     MaxInteractDistance   = 3.0,    -- max distance (m) allowed between player ped and a target point for any server validated action
     MaxVehicleDistance    = 4.0,    -- max distance (m) allowed between player and a vehicle for scrapping actions
     EventRateLimitMs      = 500,    -- minimum ms between repeated calls of the same server event per player
-    MaxActiveInstances    = 1,      -- max concurrent garage instances a single player may be inside
-    RequireServerOwnedVeh = true,   -- scrapping only allowed on vehicles spawned by this script for the instance
 }
 
 -- ============================================================
@@ -267,7 +270,7 @@ Config.VehicleParts = {
         rewardItem   = 'tire',
         rewardMin    = 1,
         rewardMax    = 1,
-        indices      = { 0, 1, 2, 3 }, -- wheel indices, 6/7 added automatically for big rigs in code
+        indices      = { 0, 1, 2, 3 }, -- wheel indices (front-left, front-right, rear-left, rear-right); only 4-wheel models are configured in Config.ScrapVehicleModels
     },
     plate = {
         label        = 'License Plate',

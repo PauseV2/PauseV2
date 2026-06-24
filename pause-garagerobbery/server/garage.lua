@@ -221,6 +221,17 @@ RegisterNetEvent('garagerobbery:server:RequestEntry', function(garageId)
         return
     end
 
+    -- ActiveInstances is keyed per-garage, so only one instance can ever
+    -- be active on a given garage at a time - this must be checked
+    -- explicitly and not inferred from the cooldown timestamp, since
+    -- Config.Cooldowns.StartCooldownOnEntry = false delays that write
+    -- until the robbery ends, leaving a window for a second player to
+    -- start a colliding instance on the same garageId.
+    if GarageRobbery.ActiveInstances[garageId] then
+        GarageRobbery.Notify(src, Config.Locales.garage_on_cooldown, 'error')
+        return
+    end
+
     if GarageRobbery.IsPlayerOnCooldown(src) then
         GarageRobbery.Notify(src, Config.Locales.player_on_cooldown, 'error')
         return

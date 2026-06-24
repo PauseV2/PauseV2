@@ -171,7 +171,7 @@ AddEventHandler('playerDropped', function()
     local src = source
     GarageRobbery.RateLimits[src] = nil
     if GarageRobbery.PlayerInstance[src] and GarageRobbery.HandlePlayerLeftInstance then
-        GarageRobbery.HandlePlayerLeftInstance(src, true)
+        GarageRobbery.HandlePlayerLeftInstance(src)
     end
 end)
 
