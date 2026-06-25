@@ -31,27 +31,28 @@
                     </div>
                 </div>
 
-                <!-- First-time setup: access code -->
+                <!-- First-time setup: activation key / recovery phrase -->
                 <div id="screen-access-code" class="screen hidden">
                     <div class="pin-box">
                         <div class="app-title" id="code-app-title">OVI</div>
-                        <div class="app-subtitle">Enter your access code</div>
-                        <input type="text" id="code-input" class="setup-input" maxlength="12" autocomplete="off" placeholder="Access code" />
-                        <button class="action-btn" id="btn-code-submit">Continue</button>
-                        <button class="link-btn" id="btn-use-recovery">Use recovery phrase instead</button>
-                        <div class="pin-error hidden" id="code-error">Invalid code.</div>
-                    </div>
-                </div>
+                        <div class="setup-tabs" id="setup-tabs">
+                            <button class="setup-tab active" id="tab-activation-key">Activation Key</button>
+                            <button class="setup-tab" id="tab-recovery-phrase">Recovery Phrase</button>
+                        </div>
 
-                <!-- First-time setup: restore via recovery phrase -->
-                <div id="screen-recovery" class="screen hidden">
-                    <div class="pin-box">
-                        <div class="app-title" id="recovery-app-title">OVI</div>
-                        <div class="app-subtitle">Enter your recovery phrase</div>
-                        <input type="text" id="recovery-input" class="setup-input" maxlength="64" autocomplete="off" placeholder="word-word-word-word-000" />
-                        <button class="action-btn" id="btn-recovery-submit">Restore</button>
-                        <button class="link-btn" id="btn-use-code">Use an access code instead</button>
-                        <div class="pin-error hidden" id="recovery-error">Phrase not recognized.</div>
+                        <div class="setup-tab-panel" id="panel-activation-key">
+                            <div class="app-subtitle">Enter your access code</div>
+                            <input type="text" id="code-input" class="setup-input" maxlength="12" autocomplete="off" placeholder="Access code" />
+                            <button class="action-btn" id="btn-code-submit">Continue</button>
+                            <div class="pin-error hidden" id="code-error">Invalid code.</div>
+                        </div>
+
+                        <div class="setup-tab-panel hidden" id="panel-recovery-phrase">
+                            <div class="app-subtitle">Enter your recovery phrase</div>
+                            <input type="text" id="recovery-input" class="setup-input" maxlength="64" autocomplete="off" placeholder="word-word-word-word-000" />
+                            <button class="action-btn" id="btn-recovery-submit">Restore</button>
+                            <div class="pin-error hidden" id="recovery-error">Phrase not recognized.</div>
+                        </div>
                     </div>
                 </div>
 

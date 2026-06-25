@@ -43,7 +43,6 @@
         boot: document.getElementById('screen-boot'),
         dashboard: document.getElementById('screen-dashboard'),
         accessCode: document.getElementById('screen-access-code'),
-        recovery: document.getElementById('screen-recovery'),
         alias: document.getElementById('screen-alias'),
     };
 
@@ -170,50 +169,46 @@
         requestAnimationFrame(() => { err.style.animation = ''; });
     }
 
+    function setSetupTab(tab) {
+        const isKey = tab === 'activation-key';
+        document.getElementById('tab-activation-key').classList.toggle('active', isKey);
+        document.getElementById('tab-recovery-phrase').classList.toggle('active', !isKey);
+        document.getElementById('panel-activation-key').classList.toggle('hidden', !isKey);
+        document.getElementById('panel-recovery-phrase').classList.toggle('hidden', isKey);
+    }
+
     let accessCodeBound = false;
     function renderAccessCodeScreen() {
         document.getElementById('code-app-title').textContent = S.theme.appName || 'OVI';
-        const input = document.getElementById('code-input');
-        input.value = '';
+        document.getElementById('code-input').value = '';
         document.getElementById('code-error').classList.add('hidden');
+        document.getElementById('recovery-input').value = '';
+        document.getElementById('recovery-error').classList.add('hidden');
+        setSetupTab('activation-key');
 
         if (accessCodeBound) return;
         accessCodeBound = true;
 
-        const submit = () => {
-            const code = input.value.trim();
+        document.getElementById('tab-activation-key').addEventListener('click', () => setSetupTab('activation-key'));
+        document.getElementById('tab-recovery-phrase').addEventListener('click', () => setSetupTab('recovery-phrase'));
+
+        const codeInput = document.getElementById('code-input');
+        const submitCode = () => {
+            const code = codeInput.value.trim();
             if (!code) return;
             post('submitAccessCode', { code });
         };
-        document.getElementById('btn-code-submit').addEventListener('click', submit);
-        input.addEventListener('keydown', (e) => { if (e.key === 'Enter') submit(); });
-        document.getElementById('btn-use-recovery').addEventListener('click', () => {
-            showScreen('recovery');
-            renderRecoveryScreen();
-        });
-    }
+        document.getElementById('btn-code-submit').addEventListener('click', submitCode);
+        codeInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') submitCode(); });
 
-    let recoveryBound = false;
-    function renderRecoveryScreen() {
-        document.getElementById('recovery-app-title').textContent = S.theme.appName || 'OVI';
-        const input = document.getElementById('recovery-input');
-        input.value = '';
-        document.getElementById('recovery-error').classList.add('hidden');
-
-        if (recoveryBound) return;
-        recoveryBound = true;
-
-        const submit = () => {
-            const phrase = input.value.trim();
+        const recoveryInput = document.getElementById('recovery-input');
+        const submitRecovery = () => {
+            const phrase = recoveryInput.value.trim();
             if (!phrase) return;
             post('submitRecoveryPhrase', { phrase });
         };
-        document.getElementById('btn-recovery-submit').addEventListener('click', submit);
-        input.addEventListener('keydown', (e) => { if (e.key === 'Enter') submit(); });
-        document.getElementById('btn-use-code').addEventListener('click', () => {
-            showScreen('accessCode');
-            renderAccessCodeScreen();
-        });
+        document.getElementById('btn-recovery-submit').addEventListener('click', submitRecovery);
+        recoveryInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') submitRecovery(); });
     }
 
     function renderAliasScreen() {
