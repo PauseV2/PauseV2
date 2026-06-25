@@ -27,7 +27,6 @@ Config.UI = {
     },
     tabs = {
         contacts   = true,
-        messages   = true,
         deliveries = true,
         connection = true,
         vault      = true,

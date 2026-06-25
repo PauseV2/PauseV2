@@ -187,7 +187,7 @@
     function renderTabbar() {
         const bar = document.getElementById('tabbar');
         bar.innerHTML = '';
-        const labels = { contacts: 'Contacts', messages: 'Msgs', deliveries: 'Drops', connection: 'Net', vault: 'Vault', burn: 'Burn' };
+        const labels = { contacts: 'Contacts', deliveries: 'Drops', connection: 'Net', vault: 'Vault', burn: 'Burn' };
         Object.keys(labels).forEach((key) => {
             if (!S.tabsCfg[key]) return;
             const btn = document.createElement('button');
@@ -212,10 +212,6 @@
         if (S.activeTab === 'contacts') {
             setSplit(true);
             renderContactsList(listEl);
-            renderContactDetail(detailEl);
-        } else if (S.activeTab === 'messages') {
-            setSplit(true);
-            renderConversationList(listEl);
             renderChatDetail(detailEl);
         } else if (S.activeTab === 'deliveries') {
             setSplit(true);
@@ -258,53 +254,6 @@
         });
     }
 
-    function trustBarPct(trust) {
-        return Math.max(0, Math.min(100, ((Number(trust) + 100) / 200) * 100));
-    }
-    function loyaltyBarPct(loyalty) {
-        return Math.max(0, Math.min(100, Number(loyalty)));
-    }
-
-    function renderContactDetail(detailEl) {
-        const c = findContact(S.selectedContactId);
-        if (!c) {
-            detailEl.innerHTML = '<div class="empty-state">Select a contact to view details.</div>';
-            return;
-        }
-        detailEl.innerHTML = `
-            <div class="simple-panel">
-                <h3 style="margin-top:0;color:var(--accent-bright)">${escapeHtml(c.full_name)} ${statusTags(c)}</h3>
-                <div class="meta">Number: ${escapeHtml(c.number)}</div>
-                <div class="meta">Personality: ${escapeHtml(c.personality)}</div>
-                <div class="meta">Preferred: ${escapeHtml(c.preferred_drug)}</div>
-                <div class="meta">Risk level: ${escapeHtml(c.risk_level)}</div>
-                <div class="meta">Deliveries done: ${escapeHtml(c.deliveries_done)}</div>
-                <div style="margin-top:10px">Trust</div>
-                <div class="bar"><div class="bar-fill" style="width:${trustBarPct(c.trust)}%"></div></div>
-                <div style="margin-top:8px">Loyalty</div>
-                <div class="bar"><div class="bar-fill" style="width:${loyaltyBarPct(c.loyalty)}%"></div></div>
-            </div>
-        `;
-    }
-
-    function renderConversationList(listEl) {
-        if (S.contacts.length === 0) {
-            listEl.innerHTML = '<div class="empty-state">No conversations yet.</div>';
-            return;
-        }
-        S.contacts.forEach((c) => {
-            const lastMsg = S.messages.filter((m) => m.contact_id === c.contact_id).slice(-1)[0];
-            const item = document.createElement('div');
-            item.className = 'list-item' + (S.selectedContactId === c.contact_id ? ' selected' : '');
-            item.innerHTML = `
-                <div class="name">${escapeHtml(c.full_name)} ${statusTags(c)}</div>
-                <div class="meta">${lastMsg ? escapeHtml(lastMsg.message).slice(0, 40) : 'No messages'}</div>
-            `;
-            item.addEventListener('click', () => { S.selectedContactId = c.contact_id; renderAll(); });
-            listEl.appendChild(item);
-        });
-    }
-
     function renderDeliveryCard(delivery, contactId) {
         if (!delivery) return '';
         const isOffer = delivery.status === 'offer';
@@ -332,7 +281,7 @@
         const contactId = S.selectedContactId;
         const c = findContact(contactId);
         if (!c) {
-            detailEl.innerHTML = '<div class="empty-state">Select a conversation.</div>';
+            detailEl.innerHTML = '<div class="empty-state">Select a contact.</div>';
             return;
         }
 
