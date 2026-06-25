@@ -7,44 +7,59 @@
 </head>
 <body>
     <div id="app" class="hidden">
+        <div class="phone-notch"></div>
 
-        <!-- PIN screen -->
-        <div id="screen-pin" class="screen hidden">
-            <div class="pin-box">
-                <div class="app-title" id="pin-app-title">OVI</div>
-                <div class="app-subtitle" id="pin-app-subtitle">Onderworld Connection Interface</div>
-                <div class="pin-dots" id="pin-dots"></div>
-                <div class="pin-pad" id="pin-pad"></div>
-                <div class="pin-error hidden" id="pin-error">Access denied.</div>
+        <div class="phone-screen">
+            <div class="status-bar">
+                <span class="status-time" id="status-time">22:47</span>
+                <span class="status-icons">
+                    <svg class="icon-signal" viewBox="0 0 18 12" fill="currentColor"><rect x="0" y="8" width="3" height="4" rx="0.5"/><rect x="5" y="5" width="3" height="7" rx="0.5"/><rect x="10" y="2" width="3" height="10" rx="0.5"/><rect x="15" y="0" width="3" height="12" rx="0.5"/></svg>
+                    <svg class="icon-wifi" viewBox="0 0 16 12" fill="currentColor"><path d="M8 9.5a1.2 1.2 0 1 1 0 2.4 1.2 1.2 0 0 1 0-2.4zM4.7 6.8a4.7 4.7 0 0 1 6.6 0l-1.2 1.2a3 3 0 0 0-4.2 0L4.7 6.8zM2 4.1a8.4 8.4 0 0 1 12 0L12.8 5.3a6.7 6.7 0 0 0-9.6 0L2 4.1z"/></svg>
+                    <svg class="icon-battery" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="20" height="11" rx="2.5" stroke="currentColor"/><rect x="2" y="2" width="14" height="8" rx="1.2" fill="currentColor"/><rect x="21.5" y="4" width="2" height="4" rx="1" fill="currentColor"/></svg>
+                </span>
             </div>
-        </div>
 
-        <!-- Boot screen -->
-        <div id="screen-boot" class="screen hidden">
-            <div class="boot-box">
-                <div class="boot-spinner"></div>
-                <div class="boot-lines" id="boot-lines"></div>
-            </div>
-        </div>
-
-        <!-- Dashboard -->
-        <div id="screen-dashboard" class="screen hidden">
-            <div class="topbar">
-                <div class="topbar-title">
-                    <span id="dash-app-title">OVI</span>
-                    <span class="topbar-alias" id="dash-alias"></span>
+            <div class="phone-body">
+                <!-- PIN screen -->
+                <div id="screen-pin" class="screen hidden">
+                    <div class="pin-box">
+                        <div class="app-title" id="pin-app-title">OVI</div>
+                        <div class="app-subtitle" id="pin-app-subtitle">Onderworld Connection Interface</div>
+                        <div class="pin-dots" id="pin-dots"></div>
+                        <div class="pin-pad" id="pin-pad"></div>
+                        <div class="pin-error hidden" id="pin-error">Access denied.</div>
+                    </div>
                 </div>
-                <button class="close-btn" id="btn-close">&times;</button>
-            </div>
 
-            <div class="content">
-                <div class="panel-list" id="panel-list"></div>
-                <div class="panel-detail" id="panel-detail"></div>
-            </div>
+                <!-- Boot screen -->
+                <div id="screen-boot" class="screen hidden">
+                    <div class="boot-box">
+                        <div class="boot-spinner"></div>
+                        <div class="boot-lines" id="boot-lines"></div>
+                    </div>
+                </div>
 
-            <div class="tabbar" id="tabbar"></div>
+                <!-- Dashboard -->
+                <div id="screen-dashboard" class="screen hidden">
+                    <div class="topbar">
+                        <div class="topbar-title">
+                            <span id="dash-app-title">OVI</span>
+                            <span class="topbar-alias" id="dash-alias"></span>
+                        </div>
+                        <button class="close-btn" id="btn-close">&times;</button>
+                    </div>
+
+                    <div class="content">
+                        <div class="panel-list" id="panel-list"></div>
+                        <div class="panel-detail" id="panel-detail"></div>
+                    </div>
+
+                    <div class="tabbar" id="tabbar"></div>
+                </div>
+            </div>
         </div>
 
+        <div class="home-indicator"></div>
     </div>
 
     <script src="app.js"></script>

@@ -23,27 +23,97 @@ html, body {
     user-select: none;
 }
 
+/* ---- phone frame ---- */
+
 #app {
     position: absolute;
-    top: 8%;
+    top: 6%;
     left: 50%;
     transform: translateX(-50%);
-    width: 420px;
-    height: 84%;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    box-shadow: 0 0 40px rgba(0, 0, 0, 0.6);
+    width: 300px;
+    height: 88%;
+    max-height: 660px;
+    background: #050505;
+    border-radius: 46px;
+    padding: 10px;
+    box-shadow: 0 0 0 2px #2a2a2a, 0 25px 70px rgba(0, 0, 0, 0.7);
     display: flex;
     flex-direction: column;
-    overflow: hidden;
 }
 
 .hidden { display: none !important; }
 
+.phone-notch {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 110px;
+    height: 22px;
+    background: #050505;
+    border-radius: 0 0 14px 14px;
+    z-index: 6;
+}
+
+.phone-screen {
+    flex: 1;
+    min-height: 0;
+    background: var(--bg);
+    border-radius: 36px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.status-bar {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 22px 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    z-index: 4;
+}
+
+.status-icons {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text);
+}
+
+.status-icons svg { display: block; }
+.icon-signal { width: 16px; height: 11px; }
+.icon-wifi { width: 14px; height: 11px; }
+.icon-battery { width: 22px; height: 11px; }
+
+.phone-body {
+    flex: 1;
+    min-height: 0;
+    position: relative;
+}
+
+.home-indicator {
+    position: absolute;
+    bottom: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 3px;
+    border-radius: 3px;
+    background: rgba(217, 242, 221, 0.35);
+    z-index: 6;
+}
+
 .screen {
-    width: 100%;
-    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     display: flex;
     flex-direction: column;
 }
@@ -222,18 +292,24 @@ html, body {
     display: flex;
     border-top: 1px solid var(--border);
     background: var(--panel);
+    padding: 6px 6px 12px;
+    gap: 2px;
 }
 
 .tab-btn {
     flex: 1;
-    padding: 10px 0;
+    min-width: 0;
+    padding: 4px 1px;
     text-align: center;
-    font-size: 10px;
-    letter-spacing: 1px;
+    font-size: 8.5px;
+    letter-spacing: 0.2px;
     color: var(--text-muted);
     cursor: pointer;
     background: none;
     border: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .tab-btn.active { color: var(--accent-bright); border-top: 2px solid var(--accent-bright); }

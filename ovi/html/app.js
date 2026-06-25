@@ -45,6 +45,16 @@
     function showApp() { app.classList.remove('hidden'); }
     function hideApp() { app.classList.add('hidden'); }
 
+    // status bar clock is cosmetic (wall clock, not the in-game clock)
+    function updateStatusClock() {
+        const el = document.getElementById('status-time');
+        if (!el) return;
+        const now = new Date();
+        el.textContent = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    }
+    updateStatusClock();
+    setInterval(updateStatusClock, 15000);
+
     function showScreen(name) {
         Object.values(screens).forEach((el) => el.classList.add('hidden'));
         screens[name].classList.remove('hidden');
