@@ -345,7 +345,7 @@
     function renderDeliveryCard(delivery, contactId) {
         if (!delivery) return '';
         const isOffer = delivery.status === 'offer';
-        const statusText = isOffer ? 'INCOMING OFFER' : delivery.status.toUpperCase();
+        const statusText = isOffer ? 'WANTS TO BUY' : delivery.status.toUpperCase();
         let actionHtml = '';
 
         if (isOffer) {
