@@ -21,6 +21,7 @@
         booted: false,
         theme: {},
         pinLength: 4,
+        pinMode: 'verify',
         enteredPin: '',
         phone: null,
         contacts: [],
@@ -41,6 +42,8 @@
         pin: document.getElementById('screen-pin'),
         boot: document.getElementById('screen-boot'),
         dashboard: document.getElementById('screen-dashboard'),
+        accessCode: document.getElementById('screen-access-code'),
+        alias: document.getElementById('screen-alias'),
     };
 
     function showApp() { app.classList.remove('hidden'); }
@@ -94,11 +97,11 @@
 
     // ---------------------------------------------------------------- pin --
 
-    function renderPinPad() {
+    function renderPinPad(subtitleOverride) {
         const titleEl = document.getElementById('pin-app-title');
         const subEl = document.getElementById('pin-app-subtitle');
         titleEl.textContent = S.theme.appName || 'OVI';
-        subEl.textContent = S.theme.appSubtitle || '';
+        subEl.textContent = subtitleOverride || S.theme.appSubtitle || '';
 
         const dots = document.getElementById('pin-dots');
         dots.innerHTML = '';
@@ -138,7 +141,11 @@
         updatePinDots();
 
         if (S.enteredPin.length === S.pinLength) {
-            post('submitPin', { pin: S.enteredPin });
+            if (S.pinMode === 'create') {
+                post('submitNewPin', { pin: S.enteredPin });
+            } else {
+                post('submitPin', { pin: S.enteredPin });
+            }
         }
     }
 
@@ -150,6 +157,46 @@
         // restart the shake animation
         err.style.animation = 'none';
         requestAnimationFrame(() => { err.style.animation = ''; });
+    }
+
+    // ------------------------------------------------------ first-time setup --
+
+    function onSetupError(inputId, errorId) {
+        document.getElementById(inputId).value = '';
+        const err = document.getElementById(errorId);
+        err.classList.remove('hidden');
+        err.style.animation = 'none';
+        requestAnimationFrame(() => { err.style.animation = ''; });
+    }
+
+    function renderAccessCodeScreen() {
+        document.getElementById('code-app-title').textContent = S.theme.appName || 'OVI';
+        const input = document.getElementById('code-input');
+        input.value = '';
+        document.getElementById('code-error').classList.add('hidden');
+
+        const submit = () => {
+            const code = input.value.trim();
+            if (!code) return;
+            post('submitAccessCode', { code });
+        };
+        document.getElementById('btn-code-submit').addEventListener('click', submit);
+        input.addEventListener('keydown', (e) => { if (e.key === 'Enter') submit(); });
+    }
+
+    function renderAliasScreen() {
+        document.getElementById('alias-app-title').textContent = S.theme.appName || 'OVI';
+        const input = document.getElementById('alias-input');
+        input.value = '';
+        document.getElementById('alias-error').classList.add('hidden');
+
+        const submit = () => {
+            const alias = input.value.trim();
+            if (!alias) return;
+            post('submitAlias', { alias });
+        };
+        document.getElementById('btn-alias-submit').addEventListener('click', submit);
+        input.addEventListener('keydown', (e) => { if (e.key === 'Enter') submit(); });
     }
 
     // --------------------------------------------------------------- boot --
@@ -539,6 +586,7 @@
                 S.theme.appSubtitle = data.config.appSubtitle;
                 applyTheme(data.config.theme);
                 S.pinLength = data.pinLength;
+                S.pinMode = 'verify';
                 S.enteredPin = '';
                 showApp();
                 showScreen('pin');
@@ -547,6 +595,37 @@
 
             case 'pinError':
                 onPinError();
+                break;
+
+            case 'showAccessCode':
+                S.theme = data.config.theme ? { ...data.config } : data.config;
+                S.theme.appName = data.config.appName;
+                S.theme.appSubtitle = data.config.appSubtitle;
+                applyTheme(data.config.theme);
+                showApp();
+                showScreen('accessCode');
+                renderAccessCodeScreen();
+                break;
+
+            case 'accessCodeError':
+                onSetupError('code-input', 'code-error');
+                break;
+
+            case 'showAliasSetup':
+                showScreen('alias');
+                renderAliasScreen();
+                break;
+
+            case 'aliasError':
+                onSetupError('alias-input', 'alias-error');
+                break;
+
+            case 'showPinSetup':
+                S.pinLength = data.pinLength;
+                S.pinMode = 'create';
+                S.enteredPin = '';
+                showScreen('pin');
+                renderPinPad('Create a PIN');
                 break;
 
             case 'boot':

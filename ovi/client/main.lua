@@ -57,6 +57,27 @@ RegisterNUICallback('addNote', function(data, cb)
     cb('ok')
 end)
 
+RegisterNUICallback('submitAccessCode', function(data, cb)
+    if OVI.State.lastPhoneSlot then
+        TriggerServerEvent('ovi:server:submitAccessCode', OVI.State.lastPhoneSlot, data.code)
+    end
+    cb('ok')
+end)
+
+RegisterNUICallback('submitAlias', function(data, cb)
+    if OVI.State.lastPhoneSlot then
+        TriggerServerEvent('ovi:server:submitAlias', OVI.State.lastPhoneSlot, data.alias)
+    end
+    cb('ok')
+end)
+
+RegisterNUICallback('submitNewPin', function(data, cb)
+    if OVI.State.lastPhoneSlot then
+        TriggerServerEvent('ovi:server:submitNewPin', OVI.State.lastPhoneSlot, data.pin)
+    end
+    cb('ok')
+end)
+
 RegisterNUICallback('requestRefresh', function(_, cb)
     if OVI.State.lastPhoneSlot then
         TriggerServerEvent('ovi:server:requestDashboard', OVI.State.lastPhoneSlot)
@@ -78,7 +99,12 @@ RegisterNetEvent('ovi:client:onUsePhone', function(slot, info, phoneRow)
     OVI.State.lastPhoneImei = info.imei
 
     if phoneRow.ovi_installed ~= 1 then
-        QBCore.Functions.Notify('No OVI install on this device. Find an installer.', 'primary')
+        if phoneRow.access_code then
+            openNui()
+            SendNUIMessage({ action = 'showAccessCode', config = Config.UI })
+        else
+            QBCore.Functions.Notify('No OVI install on this device. Find an installer.', 'primary')
+        end
         return
     end
 
@@ -88,6 +114,22 @@ RegisterNetEvent('ovi:client:onUsePhone', function(slot, info, phoneRow)
         config = Config.UI,
         pinLength = Config.Security.pinLength,
     })
+end)
+
+RegisterNetEvent('ovi:client:setupStepResult', function(step, success)
+    if step == 'code' then
+        if success then
+            SendNUIMessage({ action = 'showAliasSetup' })
+        else
+            SendNUIMessage({ action = 'accessCodeError' })
+        end
+    elseif step == 'alias' then
+        if success then
+            SendNUIMessage({ action = 'showPinSetup', pinLength = Config.Security.pinLength })
+        else
+            SendNUIMessage({ action = 'aliasError' })
+        end
+    end
 end)
 
 RegisterNetEvent('ovi:client:pinResult', function(success, slot)

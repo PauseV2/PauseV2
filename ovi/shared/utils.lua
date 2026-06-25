@@ -67,6 +67,18 @@ function OVI.GenerateIMEI()
     return OVI.GenerateRandomDigits(15)
 end
 
+--- Mixed-case alphanumeric code an installer NPC hands out for first-time
+--- phone setup, e.g. "F9jwnL17BfOA".
+function OVI.GenerateAccessCode(length)
+    local chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+    local str = ''
+    for _ = 1, length do
+        local idx = math.random(1, #chars)
+        str = str .. chars:sub(idx, idx)
+    end
+    return str
+end
+
 function OVI.GenerateContactId()
     return 'C' .. OVI.GenerateRandomDigits(8)
 end

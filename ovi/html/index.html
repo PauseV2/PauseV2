@@ -31,6 +31,28 @@
                     </div>
                 </div>
 
+                <!-- First-time setup: access code -->
+                <div id="screen-access-code" class="screen hidden">
+                    <div class="pin-box">
+                        <div class="app-title" id="code-app-title">OVI</div>
+                        <div class="app-subtitle">Enter your access code</div>
+                        <input type="text" id="code-input" class="setup-input" maxlength="12" autocomplete="off" placeholder="Access code" />
+                        <button class="action-btn" id="btn-code-submit">Continue</button>
+                        <div class="pin-error hidden" id="code-error">Invalid code.</div>
+                    </div>
+                </div>
+
+                <!-- First-time setup: alias -->
+                <div id="screen-alias" class="screen hidden">
+                    <div class="pin-box">
+                        <div class="app-title" id="alias-app-title">OVI</div>
+                        <div class="app-subtitle">Choose an alias</div>
+                        <input type="text" id="alias-input" class="setup-input" maxlength="24" autocomplete="off" placeholder="Alias" />
+                        <button class="action-btn" id="btn-alias-submit">Continue</button>
+                        <div class="pin-error hidden" id="alias-error">Invalid alias.</div>
+                    </div>
+                </div>
+
                 <!-- Boot screen -->
                 <div id="screen-boot" class="screen hidden">
                     <div class="boot-box">

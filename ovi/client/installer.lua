@@ -1,7 +1,9 @@
 -- ============================================================
--- OVI installer NPCs. Spawns each entry from config/installers.lua,
--- collects a PIN + alias via qb-input, and hands the rest to the server
--- for validation (distance, price, cooldown are all re-checked there).
+-- OVI installer NPCs. Spawns each entry from config/installers.lua and
+-- hands out a one-time access code for the player's phone (distance,
+-- price, cooldown are all re-checked server side). The player finishes
+-- setup - access code, alias, PIN - on the phone itself, see html/app.js
+-- and server/setup.lua.
 -- ============================================================
 
 if not Config.Toggle.OVIInstaller then return end
@@ -12,17 +14,7 @@ local function promptInstall(installerIndex, installerCfg)
         return
     end
 
-    local input = exports['qb-input']:ShowInput({
-        header = installerCfg.label,
-        submitText = 'Install',
-        inputs = {
-            { type = 'number', name = 'pin', text = ('%d-digit PIN'):format(Config.Security.pinLength), isRequired = true },
-            { type = 'text', name = 'alias', text = 'Alias (2-24 chars)', isRequired = true },
-        },
-    })
-    if not input or not input.pin or not input.alias then return end
-
-    TriggerServerEvent('ovi:server:installOVI', OVI.State.lastPhoneSlot, installerIndex, tostring(input.pin), input.alias)
+    TriggerServerEvent('ovi:server:installOVI', OVI.State.lastPhoneSlot, installerIndex)
 end
 
 CreateThread(function()
@@ -53,7 +45,10 @@ CreateThread(function()
     end
 end)
 
-RegisterNetEvent('ovi:client:installComplete', function(slot, newInfo)
-    OVI.State.lastPhoneSlot = slot
-    OVI.State.lastPhoneImei = newInfo.imei
+RegisterNetEvent('ovi:client:accessCodeIssued', function(code)
+    TriggerEvent('chat:addMessage', {
+        color = { 39, 174, 96 },
+        multiline = true,
+        args = { 'Unknown Number', ('Access code: %s'):format(code) },
+    })
 end)

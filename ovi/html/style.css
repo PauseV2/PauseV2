@@ -187,6 +187,21 @@ html, body {
 .pin-key:hover { background: var(--accent); border-color: var(--accent); }
 .pin-key.wide { font-size: 13px; color: var(--text-muted); }
 
+.setup-input {
+    width: 200px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 14px;
+    font-family: inherit;
+    text-align: center;
+    letter-spacing: 1px;
+}
+
+.setup-input:focus { outline: none; border-color: var(--accent); }
+
 .pin-error {
     color: var(--danger);
     font-size: 12px;

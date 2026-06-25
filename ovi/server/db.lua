@@ -25,9 +25,13 @@ end
 
 function OVI.DB.InstallOVI(imei, pin, alias)
     MySQL.update.await(
-        'UPDATE ovi_phones SET ovi_installed = 1, pin = ?, alias = ? WHERE imei = ?',
+        'UPDATE ovi_phones SET ovi_installed = 1, pin = ?, alias = ?, access_code = NULL WHERE imei = ?',
         { pin, alias, imei }
     )
+end
+
+function OVI.DB.GiveAccessCode(imei, code)
+    MySQL.update.await('UPDATE ovi_phones SET access_code = ? WHERE imei = ?', { code, imei })
 end
 
 function OVI.DB.SetPin(imei, pin)

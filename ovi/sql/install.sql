@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS `ovi_phones` (
     `phone_number`    VARCHAR(20)  NOT NULL,
     `pin`             VARCHAR(10)  DEFAULT NULL,
     `alias`           VARCHAR(50)  DEFAULT NULL,
+    `access_code`     VARCHAR(20)  DEFAULT NULL,
     `phone_type`      VARCHAR(30)  NOT NULL,
     `ovi_installed`   TINYINT(1)   NOT NULL DEFAULT 0,
     `owner_citizenid` VARCHAR(50)  DEFAULT NULL,

@@ -12,6 +12,8 @@ OVI.Cache = {
     timers      = {},  -- [deliveryId] = { warned = {}, endsAt = number }
     pinLock     = {},  -- [imei] = lockedUntilEpoch
     imeiOwner   = {},  -- [imei] = source, best-effort index of who last used a given phone
+    setupVerified = {}, -- [source] = true once the access code step passes, for the onboarding wizard
+    setupAlias    = {}, -- [source] = alias chosen mid onboarding, persisted only once the PIN step completes
 }
 
 local function Log(msg)

@@ -1,6 +1,7 @@
 -- ============================================================
--- OVI installation flow. PIN + alias are collected client side via
--- qb-input and sent here for validation + persistence.
+-- OVI installation flow. The NPC no longer collects a PIN/alias directly -
+-- it hands out a one-time access code which the player then enters on the
+-- phone itself, followed by alias + PIN creation (see server/setup.lua).
 -- ============================================================
 
 if not Config.Toggle.OVIInstaller then return end
@@ -11,7 +12,7 @@ local function cooldownKey(citizenid, installerIndex)
     return citizenid .. '_' .. installerIndex
 end
 
-RegisterNetEvent('ovi:server:installOVI', function(slot, installerIndex, pin, alias)
+RegisterNetEvent('ovi:server:installOVI', function(slot, installerIndex)
     local src = source
     local Player = OVI.GetPlayer(src)
     if not Player then return end
@@ -52,33 +53,16 @@ RegisterNetEvent('ovi:server:installOVI', function(slot, installerIndex, pin, al
         return
     end
 
-    pin = tostring(pin or '')
-    if #pin ~= Config.Security.pinLength or not pin:match('^%d+$') then
-        TriggerClientEvent('QBCore:Notify', src, ('PIN must be exactly %d digits.'):format(Config.Security.pinLength), 'error')
-        return
-    end
-
-    alias = tostring(alias or ''):gsub('^%s+', ''):gsub('%s+$', '')
-    if #alias < 2 or #alias > 24 then
-        TriggerClientEvent('QBCore:Notify', src, 'Alias must be 2-24 characters.', 'error')
-        return
-    end
-
     if not Player.Functions.RemoveMoney('cash', installerCfg.price) then
         TriggerClientEvent('QBCore:Notify', src, 'Not enough cash.', 'error')
         return
     end
 
-    OVI.DB.InstallOVI(item.info.imei, pin, alias)
-
-    local newInfo = item.info
-    newInfo.pin = pin
-    newInfo.alias = alias
-    newInfo.oviInstalled = true
-    OVI.PersistMetadata(src, slot, newInfo)
+    local code = OVI.GenerateAccessCode(Config.Security.accessCodeLength)
+    OVI.DB.GiveAccessCode(item.info.imei, code)
 
     OVI.Cache.installerCooldown[key] = os.time() + (installerCfg.cooldown * 60)
 
-    TriggerClientEvent('QBCore:Notify', src, 'OVI installed. Welcome to the network.', 'success')
-    TriggerClientEvent('ovi:client:installComplete', src, slot, newInfo)
+    TriggerClientEvent('QBCore:Notify', src, 'Access code sent. Use your phone to finish setup.', 'success')
+    TriggerClientEvent('ovi:client:accessCodeIssued', src, code)
 end)

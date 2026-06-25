@@ -76,6 +76,7 @@ server_scripts {
     'server/cloning.lua',
     'server/codes.lua',
     'server/installer.lua',
+    'server/setup.lua',
     'server/streetsales.lua'
 }
 

@@ -14,4 +14,5 @@ Config.Security = {
     gpsBeaconOnWipe     = true,  -- broadcasts a one-time GPS ping to police on wipe
     policePingChance    = 15,    -- % chance a wrong PIN attempt itself pings police
     pinLength           = 4,
+    accessCodeLength    = 12,    -- length of the first-time setup code an installer NPC hands out
 }
