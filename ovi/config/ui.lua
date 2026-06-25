@@ -28,8 +28,9 @@ Config.UI = {
     tabs = {
         contacts   = true,
         deliveries = true,
-        connection = true,
         vault      = true,
         burn       = true,
     },
+    -- Connection status (stable/raided) is opened by tapping the status bar
+    -- wifi icon, not a tabbar entry - see #status-wifi in html/app.js
 }

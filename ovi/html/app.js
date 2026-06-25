@@ -187,7 +187,7 @@
     function renderTabbar() {
         const bar = document.getElementById('tabbar');
         bar.innerHTML = '';
-        const labels = { contacts: 'Contacts', deliveries: 'Drops', connection: 'Net', vault: 'Vault', burn: 'Burn' };
+        const labels = { contacts: 'Contacts', deliveries: 'Drops', vault: 'Vault', burn: 'Burn' };
         Object.keys(labels).forEach((key) => {
             if (!S.tabsCfg[key]) return;
             const btn = document.createElement('button');
@@ -592,6 +592,12 @@
         post('close');
         hideApp();
         S.booted = false;
+    });
+
+    document.getElementById('status-wifi').addEventListener('click', () => {
+        if (!S.booted) return;
+        S.activeTab = 'connection';
+        renderAll();
     });
 
     document.addEventListener('keydown', (e) => {

@@ -87,7 +87,7 @@ html, body {
 
 .status-icons svg { display: block; }
 .icon-signal { width: 16px; height: 11px; }
-.icon-wifi { width: 14px; height: 11px; }
+.icon-wifi { width: 14px; height: 11px; cursor: pointer; pointer-events: auto; }
 .icon-battery { width: 22px; height: 11px; }
 
 .phone-body {
