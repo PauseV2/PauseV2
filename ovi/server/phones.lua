@@ -145,7 +145,7 @@ RegisterNetEvent('ovi:server:requestDashboard', function(slot)
     })
 end)
 
--- ------------------------------------------------------------------ vault --
+-- ------------------------------------------------------------------ notes --
 
 RegisterNetEvent('ovi:server:addNote', function(text)
     local src = source

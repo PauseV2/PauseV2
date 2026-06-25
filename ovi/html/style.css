@@ -314,6 +314,9 @@ html, body {
 
 .tab-btn.active { color: var(--accent-bright); border-top: 2px solid var(--accent-bright); }
 
+.tab-btn.tab-danger { color: var(--danger); }
+.tab-btn.tab-danger.active { color: var(--danger); border-top-color: var(--danger); }
+
 /* ---- list items ---- */
 
 .list-item {
@@ -454,7 +457,7 @@ button.danger-btn {
     padding: 20px;
 }
 
-/* ---- heat / vault / burn panels ---- */
+/* ---- connection / notes / burn panels ---- */
 
 .simple-panel {
     flex: 1;

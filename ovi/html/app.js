@@ -187,11 +187,11 @@
     function renderTabbar() {
         const bar = document.getElementById('tabbar');
         bar.innerHTML = '';
-        const labels = { contacts: 'Contacts', deliveries: 'Drops', vault: 'Vault', burn: 'Burn' };
+        const labels = { contacts: 'Contacts', deliveries: 'Drops', notes: 'Notes', burn: 'Burn' };
         Object.keys(labels).forEach((key) => {
             if (!S.tabsCfg[key]) return;
             const btn = document.createElement('button');
-            btn.className = 'tab-btn' + (S.activeTab === key ? ' active' : '');
+            btn.className = 'tab-btn' + (S.activeTab === key ? ' active' : '') + (key === 'burn' ? ' tab-danger' : '');
             btn.textContent = labels[key];
             btn.addEventListener('click', () => { S.activeTab = key; renderAll(); });
             bar.appendChild(btn);
@@ -220,9 +220,9 @@
         } else if (S.activeTab === 'connection') {
             setSplit(false);
             renderConnectionPanel(detailEl);
-        } else if (S.activeTab === 'vault') {
+        } else if (S.activeTab === 'notes') {
             setSplit(false);
-            renderVaultPanel(detailEl);
+            renderNotesPanel(detailEl);
         } else if (S.activeTab === 'burn') {
             setSplit(false);
             renderBurnPanel(detailEl);
@@ -391,7 +391,7 @@
         `;
     }
 
-    function renderVaultPanel(detailEl) {
+    function renderNotesPanel(detailEl) {
         const notesHtml = S.notes.length
             ? S.notes.map((n) => `<div class="note-item">${escapeHtml(n.text)}<div class="meta">${timeAgo(n.created_at)}</div></div>`).join('')
             : '<div class="empty-state">No notes saved.</div>';

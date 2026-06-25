@@ -28,7 +28,7 @@ Config.UI = {
     tabs = {
         contacts   = true,
         deliveries = true,
-        vault      = true,
+        notes      = true,
         burn       = true,
     },
     -- Connection status (stable/raided) is opened by tapping the status bar
