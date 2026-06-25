@@ -9,6 +9,9 @@ function OVI.NotifyPhoneHolder(imei, payload)
     local src = OVI.Cache.imeiOwner[imei]
     if not src then return end
 
+    local phoneRow = OVI.DB.GetPhone(imei)
+    if not phoneRow or phoneRow.online == 0 then return end
+
     if OVI.GetOpenImei(src) == imei then
         TriggerClientEvent('ovi:client:pushUpdate', src, payload)
     end

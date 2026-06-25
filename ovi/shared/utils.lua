@@ -83,6 +83,22 @@ function OVI.GenerateContactId()
     return 'C' .. OVI.GenerateRandomDigits(8)
 end
 
+local RECOVERY_WORDS = {
+    'shadow', 'ghost', 'wraith', 'cipher', 'vapor', 'ember', 'rusty', 'silent', 'cobalt', 'viper',
+    'static', 'drift', 'hollow', 'crimson', 'nomad', 'ash', 'rogue', 'quartz', 'venom', 'echo',
+    'midnight', 'copper', 'feral', 'glass', 'smoke', 'raven', 'tundra', 'obsidian', 'wolf', 'frost',
+}
+
+--- Memorable 4-word + 3-digit phrase used to restore an existing OVI
+--- identity onto a new physical phone, e.g. "shadow-ember-glass-frost-482".
+function OVI.GenerateRecoveryPhrase()
+    local words = {}
+    for i = 1, 4 do
+        words[i] = OVI.RandomFrom(RECOVERY_WORDS)
+    end
+    return table.concat(words, '-') .. '-' .. tostring(math.random(100, 999))
+end
+
 function OVI.GenerateFullName()
     local first = OVI.RandomFrom(Config.ClientNames.first)
     local last = OVI.RandomFrom(Config.ClientNames.last)

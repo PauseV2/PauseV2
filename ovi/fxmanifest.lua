@@ -35,6 +35,7 @@ shared_scripts {
     'config/police.lua',
     'config/cloning.lua',
     'config/codes.lua',
+    'config/numbergivers.lua',
     'shared/items.lua',
     'shared/utils.lua'
 }
@@ -47,6 +48,7 @@ client_scripts {
     'client/traps.lua',
     'client/cloning.lua',
     'client/suppliers.lua',
+    'client/numbergivers.lua',
     'client/streetsales.lua'
 }
 
@@ -77,6 +79,8 @@ server_scripts {
     'server/codes.lua',
     'server/installer.lua',
     'server/setup.lua',
+    'server/presence.lua',
+    'server/numbergivers.lua',
     'server/streetsales.lua'
 }
 

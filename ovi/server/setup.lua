@@ -60,6 +60,7 @@ RegisterNetEvent('ovi:server:submitNewPin', function(slot, pin)
     if #pin ~= Config.Security.pinLength or not pin:match('^%d+$') then return end
 
     OVI.DB.InstallOVI(item.info.imei, pin, alias)
+    OVI.DB.SetRecoveryPhrase(item.info.imei, OVI.GenerateRecoveryPhrase())
 
     local newInfo = item.info
     newInfo.pin = pin
@@ -71,6 +72,38 @@ RegisterNetEvent('ovi:server:submitNewPin', function(slot, pin)
     OVI.Cache.setupAlias[src] = nil
 
     TriggerClientEvent('QBCore:Notify', src, 'OVI installed. Welcome to the network.', 'success')
+    TriggerClientEvent('ovi:client:pinResult', src, true, slot)
+end)
+
+--- Alternate first-time setup path: instead of an access code + fresh
+--- alias/PIN, restore an existing identity (contacts/messages/etc) from
+--- another phone onto this one. Re-uses the same migration helper as the
+--- paid NPC cloning flow (server/cloning.lua).
+RegisterNetEvent('ovi:server:submitRecoveryPhrase', function(slot, phrase)
+    local src = source
+    local item = getOpenItem(src, slot)
+    if not item or not item.info or not item.info.imei then return end
+    local targetImei = item.info.imei
+
+    phrase = tostring(phrase or ''):gsub('^%s+', ''):gsub('%s+$', '')
+    local sourceRow = OVI.DB.GetPhoneByRecoveryPhrase(phrase)
+    if not sourceRow or sourceRow.ovi_installed == 0 or sourceRow.imei == targetImei then
+        TriggerClientEvent('ovi:client:setupStepResult', src, 'recovery', false)
+        return
+    end
+
+    OVI.DB.MigratePhoneData(sourceRow.imei, targetImei)
+    OVI.DB.InstallOVI(targetImei, sourceRow.pin, sourceRow.alias)
+    OVI.DB.SetRecoveryPhrase(targetImei, OVI.GenerateRecoveryPhrase())
+    OVI.DB.WipePhone(sourceRow.imei)
+
+    local newInfo = item.info
+    newInfo.pin = sourceRow.pin
+    newInfo.alias = sourceRow.alias
+    newInfo.oviInstalled = true
+    OVI.PersistMetadata(src, slot, newInfo)
+
+    TriggerClientEvent('QBCore:Notify', src, 'Identity restored from recovery phrase.', 'success')
     TriggerClientEvent('ovi:client:pinResult', src, true, slot)
 end)
 

@@ -34,6 +34,18 @@ function OVI.DB.GiveAccessCode(imei, code)
     MySQL.update.await('UPDATE ovi_phones SET access_code = ? WHERE imei = ?', { code, imei })
 end
 
+function OVI.DB.SetRecoveryPhrase(imei, phrase)
+    MySQL.update.await('UPDATE ovi_phones SET recovery_phrase = ? WHERE imei = ?', { phrase, imei })
+end
+
+function OVI.DB.GetPhoneByRecoveryPhrase(phrase)
+    return MySQL.single.await('SELECT * FROM ovi_phones WHERE recovery_phrase = ?', { phrase })
+end
+
+function OVI.DB.SetOnlineStatus(imei, online)
+    MySQL.update.await('UPDATE ovi_phones SET online = ? WHERE imei = ?', { online and 1 or 0, imei })
+end
+
 function OVI.DB.SetPin(imei, pin)
     MySQL.update.await('UPDATE ovi_phones SET pin = ? WHERE imei = ?', { pin, imei })
 end
@@ -141,8 +153,8 @@ end
 
 function OVI.DB.AddMessage(imei, contactId, sender, message, hidden)
     MySQL.insert.await(
-        'INSERT INTO ovi_messages (phone_imei, contact_id, sender, message, hidden) VALUES (?, ?, ?, ?, ?)',
-        { imei, contactId, sender, message, hidden and 1 or 0 }
+        'INSERT INTO ovi_messages (phone_imei, contact_id, sender, message, hidden, seen) VALUES (?, ?, ?, ?, ?, ?)',
+        { imei, contactId, sender, message, hidden and 1 or 0, sender == 'player' and 1 or 0 }
     )
 end
 
@@ -150,6 +162,24 @@ function OVI.DB.GetMessages(imei, limit)
     return MySQL.query.await(
         'SELECT * FROM ovi_messages WHERE phone_imei = ? ORDER BY created_at DESC LIMIT ?',
         { imei, limit or 200 }
+    ) or {}
+end
+
+function OVI.DB.MarkContactMessagesSeen(imei, contactId)
+    MySQL.update.await(
+        'UPDATE ovi_messages SET seen = 1 WHERE phone_imei = ? AND contact_id = ? AND seen = 0',
+        { imei, contactId }
+    )
+end
+
+--- One row per contact with unread NPC messages on this phone, e.g.
+--- { { contact_id = 'C123', unread = 3 }, ... }. Empty contacts are omitted.
+function OVI.DB.GetUnreadCounts(imei)
+    return MySQL.query.await(
+        [[SELECT contact_id, COUNT(*) AS unread FROM ovi_messages
+          WHERE phone_imei = ? AND sender = 'client' AND seen = 0
+          GROUP BY contact_id]],
+        { imei }
     ) or {}
 end
 

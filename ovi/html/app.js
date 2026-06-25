@@ -43,6 +43,7 @@
         boot: document.getElementById('screen-boot'),
         dashboard: document.getElementById('screen-dashboard'),
         accessCode: document.getElementById('screen-access-code'),
+        recovery: document.getElementById('screen-recovery'),
         alias: document.getElementById('screen-alias'),
     };
 
@@ -169,11 +170,15 @@
         requestAnimationFrame(() => { err.style.animation = ''; });
     }
 
+    let accessCodeBound = false;
     function renderAccessCodeScreen() {
         document.getElementById('code-app-title').textContent = S.theme.appName || 'OVI';
         const input = document.getElementById('code-input');
         input.value = '';
         document.getElementById('code-error').classList.add('hidden');
+
+        if (accessCodeBound) return;
+        accessCodeBound = true;
 
         const submit = () => {
             const code = input.value.trim();
@@ -182,6 +187,33 @@
         };
         document.getElementById('btn-code-submit').addEventListener('click', submit);
         input.addEventListener('keydown', (e) => { if (e.key === 'Enter') submit(); });
+        document.getElementById('btn-use-recovery').addEventListener('click', () => {
+            showScreen('recovery');
+            renderRecoveryScreen();
+        });
+    }
+
+    let recoveryBound = false;
+    function renderRecoveryScreen() {
+        document.getElementById('recovery-app-title').textContent = S.theme.appName || 'OVI';
+        const input = document.getElementById('recovery-input');
+        input.value = '';
+        document.getElementById('recovery-error').classList.add('hidden');
+
+        if (recoveryBound) return;
+        recoveryBound = true;
+
+        const submit = () => {
+            const phrase = input.value.trim();
+            if (!phrase) return;
+            post('submitRecoveryPhrase', { phrase });
+        };
+        document.getElementById('btn-recovery-submit').addEventListener('click', submit);
+        input.addEventListener('keydown', (e) => { if (e.key === 'Enter') submit(); });
+        document.getElementById('btn-use-code').addEventListener('click', () => {
+            showScreen('accessCode');
+            renderAccessCodeScreen();
+        });
     }
 
     function renderAliasScreen() {
@@ -231,6 +263,10 @@
             .sort((a, b) => (b.id > a.id ? 1 : -1))[0];
     }
 
+    function hasUnreadContacts() {
+        return S.contacts.some((c) => c.unread > 0);
+    }
+
     function renderTabbar() {
         const bar = document.getElementById('tabbar');
         bar.innerHTML = '';
@@ -240,6 +276,9 @@
             const btn = document.createElement('button');
             btn.className = 'tab-btn' + (S.activeTab === key ? ' active' : '') + (key === 'burn' ? ' tab-danger' : '');
             btn.textContent = labels[key];
+            if (key === 'contacts' && hasUnreadContacts()) {
+                btn.innerHTML += '<span class="unread-dot"></span>';
+            }
             btn.addEventListener('click', () => { S.activeTab = key; renderAll(); });
             bar.appendChild(btn);
         });
@@ -293,10 +332,17 @@
             const item = document.createElement('div');
             item.className = 'list-item' + (S.selectedContactId === c.contact_id ? ' selected' : '');
             item.innerHTML = `
-                <div class="name">${escapeHtml(c.full_name)} ${statusTags(c)}</div>
+                <div class="name">${escapeHtml(c.full_name)} ${statusTags(c)}${c.unread > 0 ? '<span class="unread-dot"></span>' : ''}</div>
                 <div class="meta">${escapeHtml(c.personality)} &middot; risk: ${escapeHtml(c.risk_level)}</div>
             `;
-            item.addEventListener('click', () => { S.selectedContactId = c.contact_id; renderAll(); });
+            item.addEventListener('click', () => {
+                S.selectedContactId = c.contact_id;
+                if (c.unread > 0) {
+                    c.unread = 0;
+                    post('markSeen', { contactId: c.contact_id });
+                }
+                renderAll();
+            });
             listEl.appendChild(item);
         });
     }
@@ -427,6 +473,7 @@
     function renderConnectionPanel(detailEl) {
         const state = S.networkRaided ? 'raided' : 'stable';
         const cfg = S.networkCfg[state] || {};
+        const phrase = (S.phone && S.phone.recovery_phrase) || '';
         detailEl.innerHTML = `
             <div class="simple-panel">
                 <div class="connection-panel connection-${state}">
@@ -434,8 +481,20 @@
                     <div class="connection-title">${escapeHtml(cfg.title || '')}</div>
                     <div class="connection-subtitle">${escapeHtml(cfg.subtitle || '')}</div>
                 </div>
+                <div class="recovery-box">
+                    <div class="recovery-label">RECOVERY PHRASE</div>
+                    <div class="recovery-phrase blurred" id="recovery-phrase-text">${escapeHtml(phrase)}</div>
+                    <button class="action-btn" id="btn-toggle-phrase">Reveal</button>
+                    <div class="recovery-hint">Use this on a new device instead of an access code to restore this identity. Keep it secret - anyone with it can take over this phone's contacts.</div>
+                </div>
             </div>
         `;
+
+        const phraseEl = document.getElementById('recovery-phrase-text');
+        document.getElementById('btn-toggle-phrase').addEventListener('click', (e) => {
+            const blurred = phraseEl.classList.toggle('blurred');
+            e.target.textContent = blurred ? 'Reveal' : 'Hide';
+        });
     }
 
     function renderNotesPanel(detailEl) {
@@ -490,9 +549,17 @@
         });
     }
 
+    function renderOnlineIndicator() {
+        const online = !!(S.phone && S.phone.online);
+        document.getElementById('online-dot').classList.toggle('online', online);
+        document.getElementById('btn-set-online').classList.toggle('active', online);
+        document.getElementById('btn-set-offline').classList.toggle('active', !online);
+    }
+
     function renderDashboardShell() {
         document.getElementById('dash-app-title').textContent = S.theme.appName || 'OVI';
-        document.getElementById('dash-alias').textContent = S.phone && S.phone.alias ? `@${S.phone.alias}` : '';
+        document.getElementById('dash-alias-text').textContent = S.phone && S.phone.alias ? `@${S.phone.alias}` : '';
+        renderOnlineIndicator();
         renderAll();
     }
 
@@ -513,6 +580,15 @@
 
         if (payload.type === 'newMessage') {
             S.messages.push({ contact_id: payload.contactId, sender: 'client', message: payload.message, created_at: Date.now() / 1000 });
+            const c = findContact(payload.contactId);
+            if (c) {
+                const isOpenThread = S.activeTab === 'contacts' && S.selectedContactId === payload.contactId;
+                if (isOpenThread) {
+                    post('markSeen', { contactId: payload.contactId });
+                } else {
+                    c.unread = (c.unread || 0) + 1;
+                }
+            }
             if (payload.deliveryId && !findDelivery(payload.deliveryId)) {
                 S.deliveries.push({
                     id: payload.deliveryId,
@@ -568,6 +644,9 @@
             S.notes.unshift({ text: payload.text, created_at: Date.now() / 1000 });
         } else if (payload.type === 'networkStatus') {
             S.networkRaided = !!payload.raided;
+        } else if (payload.type === 'onlineStatus') {
+            if (S.phone) S.phone.online = payload.online ? 1 : 0;
+            renderOnlineIndicator();
         }
 
         renderAll();
@@ -609,6 +688,10 @@
 
             case 'accessCodeError':
                 onSetupError('code-input', 'code-error');
+                break;
+
+            case 'recoveryError':
+                onSetupError('recovery-input', 'recovery-error');
                 break;
 
             case 'showAliasSetup':
@@ -677,6 +760,25 @@
         if (!S.booted) return;
         S.activeTab = 'connection';
         renderAll();
+    });
+
+    document.getElementById('dash-alias').addEventListener('click', () => {
+        if (!S.booted) return;
+        document.getElementById('online-picker').classList.toggle('hidden');
+    });
+
+    document.getElementById('btn-set-online').addEventListener('click', () => {
+        document.getElementById('online-picker').classList.add('hidden');
+        if (S.phone) S.phone.online = 1;
+        renderOnlineIndicator();
+        post('setOnlineStatus', { online: true });
+    });
+
+    document.getElementById('btn-set-offline').addEventListener('click', () => {
+        document.getElementById('online-picker').classList.add('hidden');
+        if (S.phone) S.phone.online = 0;
+        renderOnlineIndicator();
+        post('setOnlineStatus', { online: false });
     });
 
     document.addEventListener('keydown', (e) => {

@@ -124,6 +124,15 @@ RegisterNetEvent('ovi:server:requestDashboard', function(slot)
     OVI.SetOpenImei(src, imei)
 
     local contacts = OVI.DB.GetContactsForPhone(imei)
+    local unreadCounts = OVI.DB.GetUnreadCounts(imei)
+    local unreadByContact = {}
+    for _, row in ipairs(unreadCounts) do
+        unreadByContact[row.contact_id] = row.unread
+    end
+    for _, contact in ipairs(contacts) do
+        contact.unread = unreadByContact[contact.contact_id] or 0
+    end
+
     local messages = OVI.DB.GetMessages(imei, 200)
     local deliveries = OVI.DB.GetDeliveries(imei, 100)
     local notes = OVI.DB.GetNotes(imei)
@@ -157,6 +166,14 @@ RegisterNetEvent('ovi:server:addNote', function(text)
 
     OVI.DB.AddNote(imei, text)
     TriggerClientEvent('ovi:client:pushUpdate', src, { type = 'noteAdded', text = text })
+end)
+
+RegisterNetEvent('ovi:server:markSeen', function(contactId)
+    local src = source
+    local imei = OVI.GetOpenImei(src)
+    if not imei or not contactId then return end
+
+    OVI.DB.MarkContactMessagesSeen(imei, contactId)
 end)
 
 OVI.GivePhoneItem = GivePhoneItem

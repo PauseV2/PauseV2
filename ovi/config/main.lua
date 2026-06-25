@@ -31,6 +31,7 @@ Config.Toggle = {
     PoliceEvidence    = true,  -- exports for police scripts to read seized phones
     Cloning           = true,  -- phone backup/clone NPC
     CodeLanguage      = true,  -- coded slang for drugs in client messages
+    NumberGivers      = true,  -- qb-target NPCs that hand out their number to a player's OVI phone
 }
 
 -- Command used as a manual fallback to open OVI on the phone currently held

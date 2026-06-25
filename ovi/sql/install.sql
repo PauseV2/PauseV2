@@ -13,6 +13,8 @@ CREATE TABLE IF NOT EXISTS `ovi_phones` (
     `pin`             VARCHAR(10)  DEFAULT NULL,
     `alias`           VARCHAR(50)  DEFAULT NULL,
     `access_code`     VARCHAR(20)  DEFAULT NULL,
+    `recovery_phrase` VARCHAR(64)  DEFAULT NULL,
+    `online`          TINYINT(1)   NOT NULL DEFAULT 1,
     `phone_type`      VARCHAR(30)  NOT NULL,
     `ovi_installed`   TINYINT(1)   NOT NULL DEFAULT 0,
     `owner_citizenid` VARCHAR(50)  DEFAULT NULL,
@@ -68,6 +70,7 @@ CREATE TABLE IF NOT EXISTS `ovi_messages` (
     `sender`     VARCHAR(10)  NOT NULL DEFAULT 'client', -- 'client' | 'player'
     `message`    TEXT         NOT NULL,
     `hidden`     TINYINT(1)   NOT NULL DEFAULT 0,
+    `seen`       TINYINT(1)   NOT NULL DEFAULT 0,
     `created_at` TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
     KEY `idx_phone_imei` (`phone_imei`),

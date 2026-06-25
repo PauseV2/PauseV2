@@ -71,6 +71,25 @@ RegisterNUICallback('submitAlias', function(data, cb)
     cb('ok')
 end)
 
+RegisterNUICallback('submitRecoveryPhrase', function(data, cb)
+    if OVI.State.lastPhoneSlot then
+        TriggerServerEvent('ovi:server:submitRecoveryPhrase', OVI.State.lastPhoneSlot, data.phrase)
+    end
+    cb('ok')
+end)
+
+RegisterNUICallback('setOnlineStatus', function(data, cb)
+    if OVI.State.lastPhoneSlot then
+        TriggerServerEvent('ovi:server:setOnlineStatus', OVI.State.lastPhoneSlot, data.online)
+    end
+    cb('ok')
+end)
+
+RegisterNUICallback('markSeen', function(data, cb)
+    TriggerServerEvent('ovi:server:markSeen', data.contactId)
+    cb('ok')
+end)
+
 RegisterNUICallback('submitNewPin', function(data, cb)
     if OVI.State.lastPhoneSlot then
         TriggerServerEvent('ovi:server:submitNewPin', OVI.State.lastPhoneSlot, data.pin)
@@ -129,6 +148,10 @@ RegisterNetEvent('ovi:client:setupStepResult', function(step, success)
         else
             SendNUIMessage({ action = 'aliasError' })
         end
+    elseif step == 'recovery' then
+        if not success then
+            SendNUIMessage({ action = 'recoveryError' })
+        end
     end
 end)
 
@@ -161,6 +184,11 @@ end)
 
 RegisterNetEvent('ovi:client:pushUpdate', function(payload)
     SendNUIMessage({ action = 'pushUpdate', payload = payload })
+
+    if payload.type == 'newMessage' then
+        PlaySoundFrontend(-1, 'Text_Arrive_Tone', 'Phone_SoundSet_Default', true)
+        QBCore.Functions.Notify(payload.notification or 'OVI: new message', 'primary')
+    end
 end)
 
 RegisterNetEvent('ovi:client:syncSlotMetadata', function(slot, metadata)
