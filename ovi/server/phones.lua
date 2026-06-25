@@ -136,9 +136,11 @@ RegisterNetEvent('ovi:server:requestDashboard', function(slot)
         deliveries = deliveries,
         notes = notes,
         gpsLogs = gpsLogs,
+        networkRaided = Config.Toggle.NetworkStatus and OVI.IsNetworkRaided() or false,
         config = {
             ui = Config.UI,
             phoneCfg = Config.Phones[phoneRow.phone_type],
+            network = Config.NetworkStatus,
         },
     })
 end)

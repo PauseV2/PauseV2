@@ -27,6 +27,7 @@ Config.Toggle = {
     Traps             = true,  -- ambush meetings
     Suppliers         = true,  -- unlockable drug suppliers
     Ghosting          = true,  -- clients going offline/arrested/hiding/dead
+    NetworkStatus     = true,  -- global "connection stable/raided" status, flip live with /oviraid
     PoliceEvidence    = true,  -- exports for police scripts to read seized phones
     Cloning           = true,  -- phone backup/clone NPC
     CodeLanguage      = true,  -- coded slang for drugs in client messages

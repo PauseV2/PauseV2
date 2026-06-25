@@ -32,7 +32,8 @@
         selectedContactId: null,
         activeTab: 'contacts',
         tabsCfg: {},
-        showHeatAsNumber: false,
+        networkRaided: false,
+        networkCfg: {},
     };
 
     const app = document.getElementById('app');
@@ -183,17 +184,10 @@
             .sort((a, b) => (b.id > a.id ? 1 : -1))[0];
     }
 
-    function heatLabel(value) {
-        if (value >= 75) return 'CRITICAL';
-        if (value >= 50) return 'HIGH';
-        if (value >= 25) return 'MEDIUM';
-        return 'LOW';
-    }
-
     function renderTabbar() {
         const bar = document.getElementById('tabbar');
         bar.innerHTML = '';
-        const labels = { contacts: 'Contacts', messages: 'Messages', deliveries: 'Deliveries', heat: 'Heat', vault: 'Vault', burn: 'Burn' };
+        const labels = { contacts: 'Contacts', messages: 'Messages', deliveries: 'Deliveries', connection: 'Connection', vault: 'Vault', burn: 'Burn' };
         Object.keys(labels).forEach((key) => {
             if (!S.tabsCfg[key]) return;
             const btn = document.createElement('button');
@@ -227,9 +221,9 @@
             setSplit(true);
             renderDeliveriesList(listEl);
             renderDeliveryDetail(detailEl);
-        } else if (S.activeTab === 'heat') {
+        } else if (S.activeTab === 'connection') {
             setSplit(false);
-            renderHeatPanel(detailEl);
+            renderConnectionPanel(detailEl);
         } else if (S.activeTab === 'vault') {
             setSplit(false);
             renderVaultPanel(detailEl);
@@ -328,7 +322,8 @@
                 <div class="row"><span>Drug</span><span>${escapeHtml(delivery.drug)}</span></div>
                 <div class="row"><span>Quantity</span><span>${escapeHtml(delivery.quantity)}</span></div>
                 <div class="row"><span>Price</span><span>$${escapeHtml(delivery.price)}</span></div>
-                <div class="row"><span class="status">${escapeHtml(statusText)}</span>${actionHtml}</div>
+                <div class="row"><span class="status">${escapeHtml(statusText)}</span></div>
+                ${actionHtml ? `<div class="delivery-action">${actionHtml}</div>` : ''}
             </div>
         `;
     }
@@ -433,15 +428,15 @@
         if (meetBtn) meetBtn.addEventListener('click', () => post('initiateMeet', { deliveryId: d.id }));
     }
 
-    function renderHeatPanel(detailEl) {
-        const heat = S.phone ? Number(S.phone.heat || 0) : 0;
+    function renderConnectionPanel(detailEl) {
+        const state = S.networkRaided ? 'raided' : 'stable';
+        const cfg = S.networkCfg[state] || {};
         detailEl.innerHTML = `
             <div class="simple-panel">
-                <div class="heat-value">${S.showHeatAsNumber ? heat : ''}</div>
-                <div class="heat-label">${heatLabel(heat)} SUSPICION</div>
-                <div class="meta" style="text-align:center">
-                    Heat rises with deliveries, police sightings and failed traps.
-                    It decays naturally over time. Lay low if it gets too high.
+                <div class="connection-panel connection-${state}">
+                    <div class="connection-dot"></div>
+                    <div class="connection-title">${escapeHtml(cfg.title || '')}</div>
+                    <div class="connection-subtitle">${escapeHtml(cfg.subtitle || '')}</div>
                 </div>
             </div>
         `;
@@ -575,6 +570,8 @@
             if (d) d.status = 'success';
         } else if (payload.type === 'noteAdded') {
             S.notes.unshift({ text: payload.text, created_at: Date.now() / 1000 });
+        } else if (payload.type === 'networkStatus') {
+            S.networkRaided = !!payload.raided;
         }
 
         renderAll();
@@ -613,7 +610,8 @@
                 S.theme = { ...d.config.ui, appName: d.config.ui.appName, appSubtitle: d.config.ui.appSubtitle };
                 applyTheme(d.config.ui.theme);
                 S.tabsCfg = d.config.ui.tabs || {};
-                S.showHeatAsNumber = !!d.config.ui.showHeatAsNumber;
+                S.networkRaided = !!d.networkRaided;
+                S.networkCfg = d.config.network || {};
                 S.phone = d.phone;
                 S.contacts = d.contacts || [];
                 S.messages = d.messages || [];

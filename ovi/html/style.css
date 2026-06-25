@@ -397,8 +397,11 @@ html, body {
     background: var(--panel);
 }
 
-.delivery-card .row { display: flex; justify-content: space-between; margin-bottom: 4px; }
-.delivery-card .status { color: var(--accent-bright); text-transform: uppercase; font-size: 10px; }
+.delivery-card .row { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 4px; }
+.delivery-card .status { color: var(--accent-bright); text-transform: uppercase; font-size: 10px; white-space: nowrap; }
+
+.delivery-action { margin-top: 8px; }
+.delivery-action .action-btn { width: 100%; padding: 9px 12px; }
 
 .chat-input {
     display: flex;
@@ -459,19 +462,47 @@ button.danger-btn {
     padding: 16px;
 }
 
-.heat-value {
-    font-size: 36px;
-    color: var(--accent-bright);
+.connection-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     text-align: center;
-    margin-bottom: 6px;
+    padding: 30px 10px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--panel);
 }
 
-.heat-label {
-    text-align: center;
-    color: var(--text-muted);
-    font-size: 12px;
-    letter-spacing: 2px;
+.connection-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
     margin-bottom: 16px;
+    animation: pulse 1.6s ease-in-out infinite;
+}
+
+.connection-stable .connection-dot { background: var(--accent-bright); box-shadow: 0 0 10px var(--accent-bright); }
+.connection-raided .connection-dot { background: var(--danger); box-shadow: 0 0 10px var(--danger); }
+
+.connection-title {
+    font-size: 16px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+}
+
+.connection-stable .connection-title { color: var(--accent-bright); }
+.connection-raided .connection-title { color: var(--danger); }
+
+.connection-subtitle {
+    margin-top: 6px;
+    font-size: 12px;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
 }
 
 .note-item, .gps-item {

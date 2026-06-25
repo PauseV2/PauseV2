@@ -29,9 +29,8 @@ Config.UI = {
         contacts   = true,
         messages   = true,
         deliveries = true,
-        heat       = true,
+        connection = true,
         vault      = true,
         burn       = true,
     },
-    showHeatAsNumber = false, -- if false, heat is shown only as a vague label (LOW/MED/HIGH/CRITICAL)
 }
