@@ -187,7 +187,7 @@
     function renderTabbar() {
         const bar = document.getElementById('tabbar');
         bar.innerHTML = '';
-        const labels = { contacts: 'Contacts', messages: 'Messages', deliveries: 'Deliveries', connection: 'Connection', vault: 'Vault', burn: 'Burn' };
+        const labels = { contacts: 'Contacts', messages: 'Msgs', deliveries: 'Drops', connection: 'Net', vault: 'Vault', burn: 'Burn' };
         Object.keys(labels).forEach((key) => {
             if (!S.tabsCfg[key]) return;
             const btn = document.createElement('button');
