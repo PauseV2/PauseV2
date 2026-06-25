@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>OVI</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <div id="app" class="hidden">
+
+        <!-- PIN screen -->
+        <div id="screen-pin" class="screen hidden">
+            <div class="pin-box">
+                <div class="app-title" id="pin-app-title">OVI</div>
+                <div class="app-subtitle" id="pin-app-subtitle">Onderworld Connection Interface</div>
+                <div class="pin-dots" id="pin-dots"></div>
+                <div class="pin-pad" id="pin-pad"></div>
+                <div class="pin-error hidden" id="pin-error">Access denied.</div>
+            </div>
+        </div>
+
+        <!-- Boot screen -->
+        <div id="screen-boot" class="screen hidden">
+            <div class="boot-box">
+                <div class="boot-spinner"></div>
+                <div class="boot-lines" id="boot-lines"></div>
+            </div>
+        </div>
+
+        <!-- Dashboard -->
+        <div id="screen-dashboard" class="screen hidden">
+            <div class="topbar">
+                <div class="topbar-title">
+                    <span id="dash-app-title">OVI</span>
+                    <span class="topbar-alias" id="dash-alias"></span>
+                </div>
+                <button class="close-btn" id="btn-close">&times;</button>
+            </div>
+
+            <div class="content">
+                <div class="panel-list" id="panel-list"></div>
+                <div class="panel-detail" id="panel-detail"></div>
+            </div>
+
+            <div class="tabbar" id="tabbar"></div>
+        </div>
+
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
