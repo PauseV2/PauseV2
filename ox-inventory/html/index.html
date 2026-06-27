@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>OXBase Inventory</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <div id="root" class="hidden">
+        <div id="player-pane" class="pane">
+            <div class="pane-header">
+                <h2>Inventory</h2>
+                <div class="weight-wrap">
+                    <div class="weight-bar"><div id="player-weight-fill" class="weight-fill"></div></div>
+                    <span id="player-weight-text"></span>
+                </div>
+            </div>
+            <div id="player-grid" class="grid"></div>
+        </div>
+
+        <div id="context-pane" class="pane hidden">
+            <div class="pane-header">
+                <h2 id="context-title"></h2>
+                <div id="context-weight-wrap" class="weight-wrap hidden">
+                    <div class="weight-bar"><div id="context-weight-fill" class="weight-fill"></div></div>
+                    <span id="context-weight-text"></span>
+                </div>
+            </div>
+            <div id="context-grid" class="grid hidden"></div>
+            <div id="shop-list" class="hidden"></div>
+        </div>
+
+        <p id="inv-error" class="hidden"></p>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

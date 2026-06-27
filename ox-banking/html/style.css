@@ -1,0 +1,84 @@
+* {
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+body {
+    margin: 0;
+    background: transparent;
+}
+
+.hidden {
+    display: none !important;
+}
+
+#root {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 320px;
+    padding: 24px;
+    background: rgba(15, 15, 20, 0.92);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    color: #f2f2f2;
+}
+
+#root h1 {
+    margin: 0 0 16px;
+    font-size: 20px;
+    letter-spacing: 2px;
+    text-align: center;
+}
+
+.balance-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.action-row {
+    display: flex;
+    gap: 6px;
+    margin-top: 16px;
+}
+
+.action-row input {
+    flex: 1;
+    padding: 8px 10px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+    min-width: 0;
+}
+
+.action-row button {
+    background: #3a7bfd;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 10px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.close-btn {
+    display: block;
+    width: 100%;
+    margin-top: 12px;
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 8px;
+    cursor: pointer;
+}
+
+#error {
+    margin-top: 12px;
+    color: #ff6b6b;
+    text-align: center;
+}

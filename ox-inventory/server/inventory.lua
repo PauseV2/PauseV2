@@ -1,0 +1,255 @@
+-- Generic weight-based inventory engine. An "inventory" is just an id + a
+-- sparse table of slots; player inventories, stashes, (and later, shops'
+-- backrooms etc.) are all the same data structure underneath.
+
+OxInv = {
+    cache = {}, -- [id] = { id, type, label, maxWeight, slots, items = { [slot] = {slot,name,count,metadata} } }
+}
+
+local function FindItemDef(name)
+    return Items[name]
+end
+
+function OxInv.GetWeight(inv)
+    local total = 0
+
+    for _, entry in pairs(inv.items) do
+        local def = FindItemDef(entry.name)
+        if def then
+            total = total + (def.weight * entry.count)
+        end
+    end
+
+    return total
+end
+
+function OxInv.CanCarry(inv, itemName, count)
+    local def = FindItemDef(itemName)
+    if not def then return false end
+
+    return (OxInv.GetWeight(inv) + def.weight * count) <= inv.maxWeight
+end
+
+function OxInv.Load(id, invType, label, maxWeight, slots)
+    if OxInv.cache[id] then return OxInv.cache[id] end
+
+    local row = OxInvDB.Load(id)
+    local items = {}
+
+    if row and row.data then
+        local decoded = json.decode(row.data)
+
+        if decoded then
+            for _, entry in ipairs(decoded) do
+                items[entry.slot] = entry
+            end
+        end
+    end
+
+    local inv = {
+        id = id,
+        type = invType,
+        label = label or id,
+        maxWeight = maxWeight or Config.MaxWeight,
+        slots = slots or Config.MaxSlots,
+        items = items,
+    }
+
+    OxInv.cache[id] = inv
+    return inv
+end
+
+function OxInv.Get(id)
+    return OxInv.cache[id]
+end
+
+function OxInv.Save(inv)
+    local list = {}
+
+    for _, entry in pairs(inv.items) do
+        list[#list + 1] = entry
+    end
+
+    OxInvDB.Save(inv.id, inv.type, list)
+end
+
+function OxInv.Close(id)
+    local inv = OxInv.cache[id]
+    if inv then
+        OxInv.Save(inv)
+    end
+
+    OxInv.cache[id] = nil
+end
+
+-- Returns an existing stack with room, or the first empty slot, for itemName.
+local function FindSlotFor(inv, itemName, count)
+    local def = FindItemDef(itemName)
+    if not def then return nil end
+
+    if def.stack > 1 then
+        for slot = 1, inv.slots do
+            local entry = inv.items[slot]
+            if entry and entry.name == itemName and entry.count < def.stack then
+                return slot, math.min(count, def.stack - entry.count)
+            end
+        end
+    end
+
+    for slot = 1, inv.slots do
+        if not inv.items[slot] then
+            return slot, math.min(count, def.stack)
+        end
+    end
+
+    return nil
+end
+
+function OxInv.AddItem(id, itemName, count, metadata)
+    local def = FindItemDef(itemName)
+    if not def then return false, 'invalid item' end
+    if type(count) ~= 'number' or count <= 0 then return false, 'invalid count' end
+
+    local inv = OxInv.cache[id]
+    if not inv then return false, 'inventory not loaded' end
+
+    if not OxInv.CanCarry(inv, itemName, count) then
+        return false, 'not enough weight capacity'
+    end
+
+    local remaining = count
+
+    while remaining > 0 do
+        local slot, amount = FindSlotFor(inv, itemName, remaining)
+        if not slot then return false, 'not enough space' end
+
+        local entry = inv.items[slot]
+        if entry then
+            entry.count = entry.count + amount
+        else
+            inv.items[slot] = { slot = slot, name = itemName, count = amount, metadata = metadata or {} }
+        end
+
+        remaining = remaining - amount
+    end
+
+    return true
+end
+
+function OxInv.GetItemCount(id, itemName)
+    local inv = OxInv.cache[id]
+    if not inv then return 0 end
+
+    local total = 0
+    for _, entry in pairs(inv.items) do
+        if entry.name == itemName then
+            total = total + entry.count
+        end
+    end
+
+    return total
+end
+
+function OxInv.RemoveItem(id, itemName, count)
+    if type(count) ~= 'number' or count <= 0 then return false, 'invalid count' end
+
+    local inv = OxInv.cache[id]
+    if not inv then return false, 'inventory not loaded' end
+
+    if OxInv.GetItemCount(id, itemName) < count then
+        return false, 'not enough items'
+    end
+
+    local remaining = count
+
+    for slot = 1, inv.slots do
+        if remaining <= 0 then break end
+
+        local entry = inv.items[slot]
+        if entry and entry.name == itemName then
+            local take = math.min(entry.count, remaining)
+            entry.count = entry.count - take
+            remaining = remaining - take
+
+            if entry.count <= 0 then
+                inv.items[slot] = nil
+            end
+        end
+    end
+
+    return true
+end
+
+function OxInv.Snapshot(id)
+    local inv = OxInv.cache[id]
+    if not inv then return nil end
+
+    local items = {}
+
+    for slot, entry in pairs(inv.items) do
+        local def = FindItemDef(entry.name)
+
+        items[#items + 1] = {
+            slot = slot,
+            name = entry.name,
+            count = entry.count,
+            metadata = entry.metadata,
+            label = def and def.label or entry.name,
+            weight = def and def.weight or 0,
+        }
+    end
+
+    return {
+        id = inv.id,
+        label = inv.label,
+        slots = inv.slots,
+        maxWeight = inv.maxWeight,
+        weight = OxInv.GetWeight(inv),
+        items = items,
+    }
+end
+
+function OxInv.MoveItem(fromId, fromSlot, toId, toSlot, count)
+    local fromInv = OxInv.cache[fromId]
+    local toInv = OxInv.cache[toId]
+    if not fromInv or not toInv then return false, 'inventory not loaded' end
+
+    local entry = fromInv.items[fromSlot]
+    if not entry then return false, 'empty slot' end
+
+    count = math.min(count or entry.count, entry.count)
+
+    if fromId == toId then
+        local target = toInv.items[toSlot]
+
+        if target and target.name == entry.name then
+            target.count = target.count + count
+        elseif not target then
+            toInv.items[toSlot] = { slot = toSlot, name = entry.name, count = count, metadata = entry.metadata }
+        else
+            return false, 'slot occupied'
+        end
+
+        entry.count = entry.count - count
+        if entry.count <= 0 then
+            fromInv.items[fromSlot] = nil
+        end
+
+        return true
+    end
+
+    if not OxInv.CanCarry(toInv, entry.name, count) then
+        return false, 'destination inventory is full'
+    end
+
+    local removed = OxInv.RemoveItem(fromId, entry.name, count)
+    if not removed then return false, 'failed to remove item' end
+
+    local added = OxInv.AddItem(toId, entry.name, count, entry.metadata)
+    if not added then
+        OxInv.AddItem(fromId, entry.name, count, entry.metadata) -- roll back
+        return false, 'failed to add item'
+    end
+
+    return true
+end
