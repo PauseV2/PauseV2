@@ -287,6 +287,18 @@ ul { margin: 0; padding: 0; }
 }
 .service-card { border-radius: 10px; overflow: hidden; background: var(--color-surface); }
 .service-card__media img { aspect-ratio: 3/2; object-fit: cover; width: 100%; }
+.service-card__media--placeholder {
+  aspect-ratio: 3/2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
+}
+.service-card__media--placeholder .icon {
+  width: 28%;
+  height: 28%;
+  color: rgba(255,255,255,.9);
+}
 .service-card h3, .service-card__text { padding: 0 1.5rem; }
 .service-card h3 { margin-top: 1.25rem; }
 .service-card__text { padding-bottom: 1.5rem; color: #4a5568; }

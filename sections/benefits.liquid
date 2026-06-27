@@ -22,7 +22,17 @@
                   <img src="{{ block.settings.icon | image_url: width: 64 }}" alt="" width="32" height="32" loading="lazy">
                 </div>
               {%- else -%}
-                <div class="benefit-card__icon">{%- render 'icon-check' -%}</div>
+                <div class="benefit-card__icon">
+                  {%- case block.settings.icon_style -%}
+                    {%- when 'shield-check' -%}{% render 'icon-shield-check' %}
+                    {%- when 'message-circle' -%}{% render 'icon-message-circle' %}
+                    {%- when 'leaf' -%}{% render 'icon-leaf' %}
+                    {%- when 'clock' -%}{% render 'icon-clock' %}
+                    {%- when 'wrench' -%}{% render 'icon-wrench' %}
+                    {%- when 'map-pin' -%}{% render 'icon-map-pin' %}
+                    {%- else -%}{% render 'icon-check' %}
+                  {%- endcase -%}
+                </div>
               {%- endif -%}
               <h3>{{ block.settings.title }}</h3>
               {%- if block.settings.text != blank -%}
@@ -65,7 +75,23 @@
         {
           "type": "image_picker",
           "id": "icon",
-          "label": "Icoon (optioneel)"
+          "label": "Eigen icoon (optioneel)",
+          "info": "Upload een eigen icoon, of laat leeg en kies hieronder een van de meegeleverde iconen."
+        },
+        {
+          "type": "select",
+          "id": "icon_style",
+          "label": "Icoon",
+          "options": [
+            { "value": "check", "label": "Vinkje" },
+            { "value": "shield-check", "label": "Schild (kwaliteit/certificering)" },
+            { "value": "message-circle", "label": "Gesprek (advies)" },
+            { "value": "leaf", "label": "Blad (duurzaamheid/energie)" },
+            { "value": "clock", "label": "Klok (snelheid)" },
+            { "value": "wrench", "label": "Sleutel (service/onderhoud)" },
+            { "value": "map-pin", "label": "Locatiepin (lokaal)" }
+          ],
+          "default": "check"
         },
         {
           "type": "text",
@@ -89,6 +115,7 @@
         {
           "type": "benefit",
           "settings": {
+            "icon_style": "shield-check",
             "title": "Gecertificeerde installateurs",
             "text": "<p>Al onze monteurs zijn F-gassen gecertificeerd en werken volgens de geldende normen.</p>"
           }
@@ -96,6 +123,7 @@
         {
           "type": "benefit",
           "settings": {
+            "icon_style": "message-circle",
             "title": "Eerlijk en persoonlijk advies",
             "text": "<p>Geen verkooppraatjes, wel een oplossing die echt bij u past.</p>"
           }
@@ -103,6 +131,7 @@
         {
           "type": "benefit",
           "settings": {
+            "icon_style": "leaf",
             "title": "Energiezuinige systemen",
             "text": "<p>Wij adviseren over de meest efficiente en duurzame oplossing voor uw situatie.</p>"
           }
@@ -110,6 +139,7 @@
         {
           "type": "benefit",
           "settings": {
+            "icon_style": "clock",
             "title": "Nette en snelle installatie",
             "text": "<p>Vakwerk binnen de afgesproken tijd, met respect voor uw woning of pand.</p>"
           }
@@ -117,6 +147,7 @@
         {
           "type": "benefit",
           "settings": {
+            "icon_style": "wrench",
             "title": "Service en onderhoud",
             "text": "<p>Ook na de installatie staan we voor u klaar met onderhoud en storingsdienst.</p>"
           }
@@ -124,6 +155,7 @@
         {
           "type": "benefit",
           "settings": {
+            "icon_style": "map-pin",
             "title": "Lokale betrokkenheid",
             "text": "<p>Korte lijnen en persoonlijk contact, geen anoniem callcenter.</p>"
           }

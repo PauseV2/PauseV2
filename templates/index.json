@@ -16,6 +16,7 @@
         "benefit-1": {
           "type": "benefit",
           "settings": {
+            "icon_style": "shield-check",
             "title": "Gecertificeerde installateurs",
             "text": "<p>Al onze monteurs zijn F-gassen gecertificeerd en werken volgens de geldende normen.</p>"
           }
@@ -23,6 +24,7 @@
         "benefit-2": {
           "type": "benefit",
           "settings": {
+            "icon_style": "message-circle",
             "title": "Eerlijk en persoonlijk advies",
             "text": "<p>Geen verkooppraatjes, wel een oplossing die echt bij u past.</p>"
           }
@@ -30,6 +32,7 @@
         "benefit-3": {
           "type": "benefit",
           "settings": {
+            "icon_style": "leaf",
             "title": "Energiezuinige systemen",
             "text": "<p>Wij adviseren over de meest efficiente en duurzame oplossing voor uw situatie.</p>"
           }
@@ -37,6 +40,7 @@
         "benefit-4": {
           "type": "benefit",
           "settings": {
+            "icon_style": "clock",
             "title": "Nette en snelle installatie",
             "text": "<p>Vakwerk binnen de afgesproken tijd, met respect voor uw woning of pand.</p>"
           }
@@ -44,6 +48,7 @@
         "benefit-5": {
           "type": "benefit",
           "settings": {
+            "icon_style": "wrench",
             "title": "Service en onderhoud",
             "text": "<p>Ook na de installatie staan we voor u klaar met onderhoud en storingsdienst.</p>"
           }
@@ -51,6 +56,7 @@
         "benefit-6": {
           "type": "benefit",
           "settings": {
+            "icon_style": "map-pin",
             "title": "Lokale betrokkenheid",
             "text": "<p>Korte lijnen en persoonlijk contact, geen anoniem callcenter.</p>"
           }
@@ -126,6 +132,7 @@
         "service-1": {
           "type": "service",
           "settings": {
+            "icon_style": "ac-unit",
             "title": "Airco installatie",
             "text": "<p>Vakkundige installatie van airconditioning bij woningen en bedrijven, inclusief advies op maat.</p>"
           }
@@ -133,6 +140,7 @@
         "service-2": {
           "type": "service",
           "settings": {
+            "icon_style": "wrench",
             "title": "Onderhoud en service",
             "text": "<p>Periodiek onderhoud houdt uw systeem efficient en verlengt de levensduur.</p>"
           }
@@ -140,6 +148,7 @@
         "service-3": {
           "type": "service",
           "settings": {
+            "icon_style": "leaf",
             "title": "Advies en energiebesparing",
             "text": "<p>Onafhankelijk advies over de beste oplossing voor uw situatie en energieverbruik.</p>"
           }
@@ -147,6 +156,7 @@
         "service-4": {
           "type": "service",
           "settings": {
+            "icon_style": "alert",
             "title": "Storingsdienst",
             "text": "<p>Snel geholpen bij storingen, met persoonlijk contact en duidelijke uitleg.</p>"
           }

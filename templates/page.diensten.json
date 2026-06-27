@@ -18,6 +18,7 @@
         "service-1": {
           "type": "service",
           "settings": {
+            "icon_style": "ac-unit",
             "title": "Airco installatie",
             "text": "<p>Vakkundige installatie van airconditioning bij woningen en bedrijven, inclusief advies op maat.</p>"
           }
@@ -25,6 +26,7 @@
         "service-2": {
           "type": "service",
           "settings": {
+            "icon_style": "wrench",
             "title": "Onderhoud en service",
             "text": "<p>Periodiek onderhoud houdt uw systeem efficient en verlengt de levensduur.</p>"
           }
@@ -32,6 +34,7 @@
         "service-3": {
           "type": "service",
           "settings": {
+            "icon_style": "leaf",
             "title": "Advies en energiebesparing",
             "text": "<p>Onafhankelijk advies over de beste oplossing voor uw situatie en energieverbruik.</p>"
           }
@@ -39,6 +42,7 @@
         "service-4": {
           "type": "service",
           "settings": {
+            "icon_style": "alert",
             "title": "Storingsdienst",
             "text": "<p>Snel geholpen bij storingen, met persoonlijk contact en duidelijke uitleg.</p>"
           }

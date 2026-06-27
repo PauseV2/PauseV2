@@ -21,6 +21,15 @@
                 <div class="service-card__media">
                   <img src="{{ block.settings.image | image_url: width: 600 }}" alt="" loading="lazy" width="600" height="400">
                 </div>
+              {%- else -%}
+                <div class="service-card__media service-card__media--placeholder">
+                  {%- case block.settings.icon_style -%}
+                    {%- when 'wrench' -%}{% render 'icon-wrench' %}
+                    {%- when 'leaf' -%}{% render 'icon-leaf' %}
+                    {%- when 'alert' -%}{% render 'icon-alert' %}
+                    {%- else -%}{% render 'icon-ac-unit' %}
+                  {%- endcase -%}
+                </div>
               {%- endif -%}
               <h3>{{ block.settings.title }}</h3>
               {%- if block.settings.text != blank -%}
@@ -81,7 +90,20 @@
         {
           "type": "image_picker",
           "id": "image",
-          "label": "Afbeelding"
+          "label": "Afbeelding",
+          "info": "Upload een eigen foto, of laat leeg en kies hieronder een van de meegeleverde iconen."
+        },
+        {
+          "type": "select",
+          "id": "icon_style",
+          "label": "Icoon (als er geen afbeelding is)",
+          "options": [
+            { "value": "ac-unit", "label": "Airco-unit (installatie)" },
+            { "value": "wrench", "label": "Sleutel (onderhoud/service)" },
+            { "value": "leaf", "label": "Blad (advies/energie)" },
+            { "value": "alert", "label": "Waarschuwing (storingsdienst)" }
+          ],
+          "default": "ac-unit"
         },
         {
           "type": "text",
@@ -105,6 +127,7 @@
         {
           "type": "service",
           "settings": {
+            "icon_style": "ac-unit",
             "title": "Airco installatie",
             "text": "<p>Vakkundige installatie van airconditioning bij woningen en bedrijven, inclusief advies op maat.</p>"
           }
@@ -112,6 +135,7 @@
         {
           "type": "service",
           "settings": {
+            "icon_style": "wrench",
             "title": "Onderhoud en service",
             "text": "<p>Periodiek onderhoud houdt uw systeem efficient en verlengt de levensduur.</p>"
           }
@@ -119,6 +143,7 @@
         {
           "type": "service",
           "settings": {
+            "icon_style": "leaf",
             "title": "Advies en energiebesparing",
             "text": "<p>Onafhankelijk advies over de beste oplossing voor uw situatie en energieverbruik.</p>"
           }
@@ -126,6 +151,7 @@
         {
           "type": "service",
           "settings": {
+            "icon_style": "alert",
             "title": "Storingsdienst",
             "text": "<p>Snel geholpen bij storingen, met persoonlijk contact en duidelijke uitleg.</p>"
           }
