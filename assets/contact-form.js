@@ -2,29 +2,35 @@ document.addEventListener('DOMContentLoaded', function () {
   var form = document.getElementById('ContactForm');
   if (!form) return;
 
-  var typeInputs = form.querySelectorAll('input[name="contact[customer_type]"]');
-  var businessFields = form.querySelectorAll('.field--business');
+  var typeSwitch = document.getElementById('ContactFormCustomerType');
+  var typeLabels = form.querySelectorAll('[data-type-label]');
   var companyInput = document.getElementById('ContactFormCompany');
   var kvkInput = document.getElementById('ContactFormKvk');
   var messageInput = document.getElementById('ContactFormMessage');
   var headerPattern = /^Type aanvraag: (Particulier|Zakelijk)\n(Bedrijfsnaam:.*\nKVK-nummer:.*\n)?\n/;
+  var NA = 'N.v.t.';
 
   function isBusiness() {
-    var checked = form.querySelector('input[name="contact[customer_type]"]:checked');
-    return !!checked && checked.value === 'zakelijk';
+    return !!typeSwitch && typeSwitch.checked;
   }
 
   function updateBusinessFields() {
     var business = isBusiness();
-    businessFields.forEach(function (field) {
-      field.hidden = !business;
+    [companyInput, kvkInput].forEach(function (input) {
+      if (!input) return;
+      input.disabled = !business;
+      input.value = business ? '' : NA;
     });
     if (companyInput) companyInput.required = business;
+    typeLabels.forEach(function (label) {
+      var isActive = label.getAttribute('data-type-label') === (business ? 'zakelijk' : 'particulier');
+      label.classList.toggle('is-active', isActive);
+    });
   }
 
-  typeInputs.forEach(function (input) {
-    input.addEventListener('change', updateBusinessFields);
-  });
+  if (typeSwitch) {
+    typeSwitch.addEventListener('change', updateBusinessFields);
+  }
   updateBusinessFields();
 
   form.addEventListener('submit', function () {

@@ -221,6 +221,35 @@ ul { margin: 0; padding: 0; }
 .benefit-card p { color: #4a5568; margin: 0; }
 
 /* ==========================================================================
+   Scroll-in animations
+   ========================================================================== */
+[data-animate] {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity .6s ease, transform .6s ease;
+}
+[data-animate].is-visible { opacity: 1; transform: none; }
+
+/* ==========================================================================
+   Stats counter
+   ========================================================================== */
+.stats-counter__inner { text-align: center; }
+.stats-counter__grid {
+  margin-top: 2rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 2rem;
+}
+.stats-counter__item { display: flex; flex-direction: column; gap: .35rem; }
+.stats-counter__number {
+  font-family: var(--font-heading), sans-serif;
+  font-weight: var(--font-heading-weight, 700);
+  font-size: clamp(2rem, 4vw, 2.75rem);
+  color: var(--color-primary);
+}
+.stats-counter__label { color: #4a5568; font-size: .95rem; }
+
+/* ==========================================================================
    How it works (steps)
    ========================================================================== */
 .steps { list-style: none; max-width: 760px; margin: 0 auto; }
@@ -260,6 +289,31 @@ ul { margin: 0; padding: 0; }
 @media (max-width: 760px) {
   .image-with-text__inner { grid-template-columns: 1fr; }
   .image-with-text--reverse .image-with-text__media { order: 0; }
+}
+
+/* ==========================================================================
+   Why choose us
+   ========================================================================== */
+.why-choose-us__inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  align-items: center;
+}
+.why-choose-us--reverse .why-choose-us__media { order: 2; }
+.why-choose-us__media img, .why-choose-us__media .placeholder-image svg { border-radius: 10px; width: 100%; }
+.why-choose-us__list { margin: 1.5rem 0; display: flex; flex-direction: column; gap: .85rem; }
+.why-choose-us__list li { display: flex; align-items: flex-start; gap: .65rem; }
+.why-choose-us__list .icon {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  color: var(--color-accent);
+  margin-top: .1rem;
+}
+@media (max-width: 760px) {
+  .why-choose-us__inner { grid-template-columns: 1fr; }
+  .why-choose-us--reverse .why-choose-us__media { order: 0; }
 }
 
 /* ==========================================================================
@@ -351,40 +405,55 @@ ul { margin: 0; padding: 0; }
 
 .contact-form { display: flex; flex-direction: column; gap: 1.1rem; }
 
-.form-type-toggle {
-  display: flex;
-  gap: .6rem;
-  border: none;
-  padding: 0;
-  margin: 0 0 .25rem;
-}
-.form-type-toggle legend {
-  font-weight: 600;
-  font-size: .92rem;
-  margin-bottom: .5rem;
-  width: 100%;
-}
-.form-type-toggle__option {
-  flex: 1;
+.customer-type-switch {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: .5rem;
-  padding: .65rem 1rem;
-  border: 1px solid rgba(0,0,0,.16);
-  border-radius: 6px;
-  cursor: pointer;
+  gap: .75rem;
+  margin: 0 0 .25rem;
+}
+.customer-type-switch__label {
   font-weight: 600;
   font-size: .92rem;
-  transition: background .15s ease, border-color .15s ease, color .15s ease;
+  color: rgba(0,0,0,.4);
+  transition: color .15s ease;
 }
-.form-type-toggle__option input { position: absolute; opacity: 0; width: 0; height: 0; }
-.form-type-toggle__option:has(input:checked) {
-  background: var(--color-primary);
-  border-color: var(--color-primary);
-  color: #fff;
+.customer-type-switch__label.is-active { color: var(--color-text); }
+.customer-type-switch .switch {
+  position: relative;
+  display: inline-flex;
+  width: 52px;
+  height: 28px;
+  flex: none;
+  cursor: pointer;
 }
-.form-type-toggle__option:has(input:focus-visible) { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+.customer-type-switch .switch input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  margin: 0;
+  cursor: pointer;
+}
+.switch__track {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,.18);
+  border-radius: 999px;
+  transition: background .2s ease;
+}
+.switch__thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0,0,0,.3);
+  transition: transform .2s ease;
+}
+.customer-type-switch .switch input:checked ~ .switch__track { background: var(--color-primary); }
+.customer-type-switch .switch input:checked ~ .switch__track .switch__thumb { transform: translateX(24px); }
+.customer-type-switch .switch input:focus-visible ~ .switch__track { outline: 2px solid var(--color-accent); outline-offset: 2px; }
 
 .field { display: flex; flex-direction: column; gap: .4rem; }
 .field label { font-weight: 600; font-size: .92rem; }
@@ -400,6 +469,7 @@ ul { margin: 0; padding: 0; }
   outline: 2px solid var(--color-accent);
   outline-offset: 1px;
 }
+.field input:disabled { background: rgba(0,0,0,.04); color: rgba(0,0,0,.4); cursor: not-allowed; }
 .contact-form .button { align-self: flex-start; }
 
 .form-status { padding: .85rem 1rem; border-radius: 6px; font-weight: 600; }

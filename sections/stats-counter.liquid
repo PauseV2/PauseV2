@@ -1,0 +1,70 @@
+<section class="section stats-counter">
+  <div class="container stats-counter__inner">
+    {%- if section.settings.eyebrow != blank -%}
+      <p class="eyebrow">{{ section.settings.eyebrow }}</p>
+    {%- endif -%}
+    {%- if section.settings.heading != blank -%}
+      <h2>{{ section.settings.heading }}</h2>
+    {%- endif -%}
+    <div class="stats-counter__grid">
+      {%- for block in section.blocks -%}
+        <div class="stats-counter__item" data-animate {{ block.shopify_attributes }}>
+          <span class="stats-counter__number" data-count-to="{{ block.settings.number }}">0</span>
+          <span class="stats-counter__label">{{ block.settings.label }}</span>
+        </div>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Statistieken",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Kicker",
+      "default": "In cijfers"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Titel",
+      "default": "Ons werk spreekt voor zich"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "stat",
+      "name": "Statistiek",
+      "settings": [
+        {
+          "type": "text",
+          "id": "number",
+          "label": "Getal",
+          "info": "Bijv. 2000+ of 98%",
+          "default": "2000+"
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Omschrijving",
+          "default": "Airco's geinstalleerd"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Statistieken",
+      "blocks": [
+        { "type": "stat", "settings": { "number": "2000+", "label": "Airco's geinstalleerd" } },
+        { "type": "stat", "settings": { "number": "15+", "label": "Jaar ervaring" } },
+        { "type": "stat", "settings": { "number": "98%", "label": "Tevreden klanten" } },
+        { "type": "stat", "settings": { "number": "24/7", "label": "Bereikbaar bij storingen" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

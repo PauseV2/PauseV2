@@ -43,31 +43,28 @@
           <p class="form-status form-status--error" tabindex="-1" autofocus>{{ 'contact.form.error' | t }}</p>
         {%- endif -%}
 
-        <fieldset class="form-type-toggle">
-          <legend>{{ 'contact.form.customer_type' | t }}</legend>
-          <label class="form-type-toggle__option">
-            <input type="radio" name="contact[customer_type]" value="particulier" checked>
-            <span>{{ 'contact.form.particulier' | t }}</span>
+        <div class="customer-type-switch">
+          <span class="customer-type-switch__label is-active" data-type-label="particulier">{{ 'contact.form.particulier' | t }}</span>
+          <label class="switch">
+            <input type="checkbox" id="ContactFormCustomerType" name="contact[customer_type]" value="zakelijk">
+            <span class="switch__track"><span class="switch__thumb"></span></span>
           </label>
-          <label class="form-type-toggle__option">
-            <input type="radio" name="contact[customer_type]" value="zakelijk">
-            <span>{{ 'contact.form.zakelijk' | t }}</span>
-          </label>
-        </fieldset>
+          <span class="customer-type-switch__label" data-type-label="zakelijk">{{ 'contact.form.zakelijk' | t }}</span>
+        </div>
 
         <div class="field">
           <label for="ContactFormName">{{ 'contact.form.name' | t }}</label>
           <input type="text" id="ContactFormName" name="contact[name]" value="{% if form.name %}{{ form.name }}{% endif %}" autocomplete="name" required>
         </div>
 
-        <div class="field field--business" hidden>
+        <div class="field field--business">
           <label for="ContactFormCompany">{{ 'contact.form.company' | t }}</label>
-          <input type="text" id="ContactFormCompany" name="contact[company]" autocomplete="organization">
+          <input type="text" id="ContactFormCompany" name="contact[company]" value="N.v.t." disabled autocomplete="organization">
         </div>
 
-        <div class="field field--business" hidden>
+        <div class="field field--business">
           <label for="ContactFormKvk">{{ 'contact.form.kvk' | t }}</label>
-          <input type="text" id="ContactFormKvk" name="contact[kvk]" inputmode="numeric">
+          <input type="text" id="ContactFormKvk" name="contact[kvk]" value="N.v.t." disabled inputmode="numeric">
         </div>
 
         <div class="field">

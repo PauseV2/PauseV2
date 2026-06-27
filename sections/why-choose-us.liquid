@@ -1,0 +1,115 @@
+<section class="section why-choose-us {% if section.settings.layout == 'image_right' %}why-choose-us--reverse{% endif %}">
+  <div class="container why-choose-us__inner">
+    <div class="why-choose-us__media" data-animate>
+      {%- if section.settings.image != blank -%}
+        <img
+          src="{{ section.settings.image | image_url: width: 1200 }}"
+          alt="{{ section.settings.image.alt | escape }}"
+          loading="lazy"
+          width="{{ section.settings.image.width }}"
+          height="{{ section.settings.image.height }}"
+        >
+      {%- else -%}
+        <div class="placeholder-image">{{ 'image' | placeholder_svg_tag }}</div>
+      {%- endif -%}
+    </div>
+    <div class="why-choose-us__content" data-animate>
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="eyebrow">{{ section.settings.eyebrow }}</p>
+      {%- endif -%}
+      {%- if section.settings.heading != blank -%}
+        <h2>{{ section.settings.heading }}</h2>
+      {%- endif -%}
+      {%- if section.settings.text != blank -%}
+        <div class="section__text">{{ section.settings.text }}</div>
+      {%- endif -%}
+      {%- if section.blocks.size > 0 -%}
+        <ul class="why-choose-us__list" role="list">
+          {%- for block in section.blocks -%}
+            <li {{ block.shopify_attributes }}>{% render 'icon-check' %}<span>{{ block.settings.text }}</span></li>
+          {%- endfor -%}
+        </ul>
+      {%- endif -%}
+      {%- if section.settings.button_label != blank -%}
+        <a href="{{ section.settings.button_url }}" class="button">{{ section.settings.button_label }}</a>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Waarom kiezen voor ons",
+  "settings": [
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Indeling",
+      "options": [
+        { "value": "image_left", "label": "Afbeelding links" },
+        { "value": "image_right", "label": "Afbeelding rechts" }
+      ],
+      "default": "image_right"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Afbeelding"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Kicker",
+      "default": "Waarom Klasse Klimaat"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Titel",
+      "default": "Waarom kiezen klanten voor ons"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Tekst",
+      "default": "<p>We helpen u graag aan een comfortabel binnenklimaat, zonder gedoe en met persoonlijke aandacht.</p>"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Knoptekst"
+    },
+    {
+      "type": "url",
+      "id": "button_url",
+      "label": "Knoplink"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "point",
+      "name": "Sterk punt",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Tekst",
+          "default": "Gecertificeerde en verzekerde monteurs"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Waarom kiezen voor ons",
+      "blocks": [
+        { "type": "point", "settings": { "text": "Meer dan 2000 airco's vakkundig geinstalleerd" } },
+        { "type": "point", "settings": { "text": "Gecertificeerde en verzekerde monteurs" } },
+        { "type": "point", "settings": { "text": "Vaste, transparante prijzen zonder verrassingen" } },
+        { "type": "point", "settings": { "text": "Snelle service en korte responstijd bij storingen" } },
+        { "type": "point", "settings": { "text": "Persoonlijk advies, geen verkooppraatjes" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

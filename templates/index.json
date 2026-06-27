@@ -10,6 +10,20 @@
         "button_url": "/pages/contact"
       }
     },
+    "stats_counter": {
+      "type": "stats-counter",
+      "blocks": {
+        "stat-1": { "type": "stat", "settings": { "number": "2000+", "label": "Airco's geinstalleerd" } },
+        "stat-2": { "type": "stat", "settings": { "number": "15+", "label": "Jaar ervaring" } },
+        "stat-3": { "type": "stat", "settings": { "number": "98%", "label": "Tevreden klanten" } },
+        "stat-4": { "type": "stat", "settings": { "number": "24/7", "label": "Bereikbaar bij storingen" } }
+      },
+      "block_order": ["stat-1", "stat-2", "stat-3", "stat-4"],
+      "settings": {
+        "eyebrow": "In cijfers",
+        "heading": "Ons werk spreekt voor zich"
+      }
+    },
     "benefits": {
       "type": "benefits",
       "blocks": {
@@ -67,6 +81,25 @@
         "eyebrow": "Waarom kiezen voor ons",
         "heading": "De voordelen van werken met ons",
         "text": ""
+      }
+    },
+    "why_choose_us": {
+      "type": "why-choose-us",
+      "blocks": {
+        "point-1": { "type": "point", "settings": { "text": "Meer dan 2000 airco's vakkundig geinstalleerd" } },
+        "point-2": { "type": "point", "settings": { "text": "Gecertificeerde en verzekerde monteurs" } },
+        "point-3": { "type": "point", "settings": { "text": "Vaste, transparante prijzen zonder verrassingen" } },
+        "point-4": { "type": "point", "settings": { "text": "Snelle service en korte responstijd bij storingen" } },
+        "point-5": { "type": "point", "settings": { "text": "Persoonlijk advies, geen verkooppraatjes" } }
+      },
+      "block_order": ["point-1", "point-2", "point-3", "point-4", "point-5"],
+      "settings": {
+        "layout": "image_right",
+        "eyebrow": "Waarom Klasse Klimaat",
+        "heading": "Waarom kiezen klanten voor ons",
+        "text": "<p>We helpen u graag aan een comfortabel binnenklimaat, zonder gedoe en met persoonlijke aandacht.</p>",
+        "button_label": "Vraag advies aan",
+        "button_url": "/pages/contact"
       }
     },
     "image_with_text": {
@@ -171,6 +204,17 @@
         "button_url": "/pages/contact"
       }
     },
+    "maintenance_highlight": {
+      "type": "image-with-text",
+      "settings": {
+        "layout": "image_right",
+        "eyebrow": "Onderhoud & reiniging",
+        "heading": "Houd uw airco in topconditie",
+        "text": "<p>Een vuile of slecht onderhouden airco kost energie en is minder gezond voor uw binnenlucht. Met onze periodieke onderhouds- en reinigingsbeurt blijft uw systeem optimaal presteren en gaat het langer mee.</p>",
+        "button_label": "Onderhoud aanvragen",
+        "button_url": "/pages/contact"
+      }
+    },
     "testimonials": {
       "type": "testimonials",
       "blocks": {
@@ -215,5 +259,5 @@
       }
     }
   },
-  "order": ["hero", "benefits", "image_with_text", "how_we_work", "services", "testimonials", "cta"]
+  "order": ["hero", "stats_counter", "benefits", "why_choose_us", "image_with_text", "how_we_work", "services", "maintenance_highlight", "testimonials", "cta"]
 }
