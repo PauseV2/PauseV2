@@ -4,13 +4,13 @@
       {%- if settings.logo != blank -%}
         <img
           src="{{ settings.logo | image_url: width: 320 }}"
-          alt="{{ shop.name }}"
+          alt="{{ settings.company_name | default: shop.name }}"
           width="{{ settings.logo_width }}"
           style="max-width: {{ settings.logo_width }}px;"
           loading="eager"
         >
       {%- else -%}
-        <span class="site-header__logo-text">{{ shop.name }}</span>
+        <span class="site-header__logo-text">{{ settings.company_name | default: shop.name }}</span>
       {%- endif -%}
     </a>
 

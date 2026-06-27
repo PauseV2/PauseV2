@@ -2,9 +2,9 @@
   <div class="container site-footer__grid">
     <div class="site-footer__about">
       {%- if settings.logo != blank -%}
-        <img src="{{ settings.logo | image_url: width: 240 }}" alt="{{ shop.name }}" width="160" loading="lazy">
+        <img src="{{ settings.logo | image_url: width: 240 }}" alt="{{ settings.company_name | default: shop.name }}" width="160" loading="lazy">
       {%- else -%}
-        <p class="site-footer__logo-text">{{ shop.name }}</p>
+        <p class="site-footer__logo-text">{{ settings.company_name | default: shop.name }}</p>
       {%- endif -%}
       {%- if section.settings.about_text != blank -%}
         <div class="site-footer__text">{{ section.settings.about_text }}</div>
@@ -49,7 +49,7 @@
   </div>
 
   <div class="container site-footer__bottom">
-    <p>&copy; {{ 'now' | date: '%Y' }} {{ shop.name }}. {{ 'footer.rights' | t }}</p>
+    <p>&copy; {{ 'now' | date: '%Y' }} {{ settings.company_name | default: shop.name }}. {{ 'footer.rights' | t }}</p>
   </div>
 </footer>
 

@@ -2,8 +2,9 @@
   "current": "Default",
   "presets": {
     "Default": {
-      "company_phone": "085 401 2345",
-      "company_email": "info@voorbeeld-airco.nl",
+      "company_name": "Klasse Klimaat",
+      "company_phone": "00000",
+      "company_email": "00000",
       "company_address": "Industrieweg 12, 3542 AB Utrecht",
       "company_hours": "Ma t/m vr: 08:00 - 17:00",
       "logo_width": 160,

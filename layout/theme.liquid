@@ -6,10 +6,10 @@
   <meta name="theme-color" content="{{ settings.color_primary }}">
 
   <title>
-    {{ page_title }}{% if page_title == blank %}{{ shop.name }}{% endif %}
+    {{ page_title }}{% if page_title == blank %}{{ settings.company_name | default: shop.name }}{% endif %}
     {%- if current_tags %} &ndash; {{ 'general.meta.tags' | t: tags: current_tags | join: ', ' }}{% endif -%}
     {%- if current_page != 1 %} &ndash; {{ 'general.meta.page' | t: page: current_page }}{% endif -%}
-    {%- unless page_title contains shop.name %} &ndash; {{ shop.name }}{% endunless -%}
+    {%- unless page_title contains settings.company_name %} &ndash; {{ settings.company_name | default: shop.name }}{% endunless -%}
   </title>
 
   {% if page_description %}

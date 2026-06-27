@@ -11,6 +11,13 @@
     "name": "Bedrijfsgegevens",
     "settings": [
       {
+        "type": "text",
+        "id": "company_name",
+        "label": "Bedrijfsnaam",
+        "default": "Klasse Klimaat",
+        "info": "Wordt getoond in het menu, de footer en als paginatitel (los van de naam van uw Shopify-account)."
+      },
+      {
         "type": "header",
         "content": "Contactgegevens"
       },
@@ -18,14 +25,14 @@
         "type": "text",
         "id": "company_phone",
         "label": "Telefoonnummer",
-        "default": "085 401 2345",
+        "default": "00000",
         "info": "Wordt overal getoond als klikbare 'bel ons' link."
       },
       {
         "type": "text",
         "id": "company_email",
         "label": "E-mailadres",
-        "default": "info@voorbeeld-airco.nl"
+        "default": "00000"
       },
       {
         "type": "text",
