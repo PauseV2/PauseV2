@@ -12,12 +12,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function animateCount(el) {
     var raw = el.getAttribute('data-count-to') || '';
-    var target = parseInt(raw.replace(/[^0-9]/g, ''), 10);
-    if (isNaN(target)) {
+    var match = raw.match(/^(\d+)/);
+    if (!match) {
       el.textContent = raw;
       return;
     }
-    var suffix = raw.replace(/^[0-9]+/, '');
+    var target = parseInt(match[1], 10);
+    var suffix = raw.slice(match[1].length);
     var duration = 1200;
     var start = null;
 
