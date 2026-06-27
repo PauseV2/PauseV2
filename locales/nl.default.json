@@ -23,12 +23,17 @@
   },
   "contact": {
     "form": {
+      "customer_type": "Soort aanvraag",
+      "particulier": "Particulier",
+      "zakelijk": "Zakelijk",
+      "company": "Bedrijfsnaam",
+      "kvk": "KVK-nummer (optioneel)",
       "name": "Naam",
       "email": "E-mailadres",
       "phone": "Telefoonnummer",
       "message": "Uw vraag of bericht",
-      "submit": "Verstuur bericht",
-      "success": "Bedankt voor uw bericht! We nemen zo snel mogelijk contact met u op.",
+      "submit": "Verstuur aanvraag",
+      "success": "Bedankt voor uw aanvraag! We nemen zo snel mogelijk contact met u op.",
       "error": "Er is iets misgegaan bij het versturen. Controleer uw gegevens en proberen het opnieuw."
     }
   }

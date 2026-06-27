@@ -350,6 +350,42 @@ ul { margin: 0; padding: 0; }
 .contact__details .icon { width: 20px; height: 20px; color: var(--color-accent); flex: none; }
 
 .contact-form { display: flex; flex-direction: column; gap: 1.1rem; }
+
+.form-type-toggle {
+  display: flex;
+  gap: .6rem;
+  border: none;
+  padding: 0;
+  margin: 0 0 .25rem;
+}
+.form-type-toggle legend {
+  font-weight: 600;
+  font-size: .92rem;
+  margin-bottom: .5rem;
+  width: 100%;
+}
+.form-type-toggle__option {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .5rem;
+  padding: .65rem 1rem;
+  border: 1px solid rgba(0,0,0,.16);
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: .92rem;
+  transition: background .15s ease, border-color .15s ease, color .15s ease;
+}
+.form-type-toggle__option input { position: absolute; opacity: 0; width: 0; height: 0; }
+.form-type-toggle__option:has(input:checked) {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #fff;
+}
+.form-type-toggle__option:has(input:focus-visible) { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+
 .field { display: flex; flex-direction: column; gap: .4rem; }
 .field label { font-weight: 600; font-size: .92rem; }
 .field input, .field textarea {

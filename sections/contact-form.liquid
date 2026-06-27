@@ -43,9 +43,31 @@
           <p class="form-status form-status--error" tabindex="-1" autofocus>{{ 'contact.form.error' | t }}</p>
         {%- endif -%}
 
+        <fieldset class="form-type-toggle">
+          <legend>{{ 'contact.form.customer_type' | t }}</legend>
+          <label class="form-type-toggle__option">
+            <input type="radio" name="contact[customer_type]" value="particulier" checked>
+            <span>{{ 'contact.form.particulier' | t }}</span>
+          </label>
+          <label class="form-type-toggle__option">
+            <input type="radio" name="contact[customer_type]" value="zakelijk">
+            <span>{{ 'contact.form.zakelijk' | t }}</span>
+          </label>
+        </fieldset>
+
         <div class="field">
           <label for="ContactFormName">{{ 'contact.form.name' | t }}</label>
           <input type="text" id="ContactFormName" name="contact[name]" value="{% if form.name %}{{ form.name }}{% endif %}" autocomplete="name" required>
+        </div>
+
+        <div class="field field--business" hidden>
+          <label for="ContactFormCompany">{{ 'contact.form.company' | t }}</label>
+          <input type="text" id="ContactFormCompany" name="contact[company]" autocomplete="organization">
+        </div>
+
+        <div class="field field--business" hidden>
+          <label for="ContactFormKvk">{{ 'contact.form.kvk' | t }}</label>
+          <input type="text" id="ContactFormKvk" name="contact[kvk]" inputmode="numeric">
         </div>
 
         <div class="field">
@@ -77,6 +99,8 @@
   </div>
 </section>
 
+{{ 'contact-form.js' | asset_url | script_tag }}
+
 {% schema %}
 {
   "name": "Contactformulier",
@@ -91,13 +115,13 @@
       "type": "text",
       "id": "heading",
       "label": "Titel",
-      "default": "Stel uw vraag"
+      "default": "Vraag een vrijblijvende offerte aan"
     },
     {
       "type": "richtext",
       "id": "text",
       "label": "Tekst",
-      "default": "<p>Heeft u een vraag of wilt u vrijblijvend advies? Vul het formulier in of neem direct telefonisch contact op.</p>"
+      "default": "<p>Vraag een vrijblijvende offerte aan als particulier of als bedrijf. Vul het formulier in of neem direct telefonisch contact op.</p>"
     }
   ],
   "presets": [
