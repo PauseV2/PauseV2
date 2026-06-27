@@ -1,0 +1,27 @@
+CREATE TABLE IF NOT EXISTS `ox_players` (
+    `license` VARCHAR(50) NOT NULL,
+    `license2` VARCHAR(50) DEFAULT NULL,
+    `discord` VARCHAR(30) DEFAULT NULL,
+    `name` VARCHAR(50) DEFAULT NULL,
+    `first_seen` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `last_seen` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`license`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
+
+CREATE TABLE IF NOT EXISTS `ox_characters` (
+    `citizenid` VARCHAR(20) NOT NULL,
+    `license` VARCHAR(50) NOT NULL,
+    `slot` INT NOT NULL DEFAULT 1,
+    `charinfo` LONGTEXT DEFAULT NULL,
+    `job` LONGTEXT DEFAULT NULL,
+    `gang` LONGTEXT DEFAULT NULL,
+    `money` LONGTEXT DEFAULT NULL,
+    `metadata` LONGTEXT DEFAULT NULL,
+    `position` LONGTEXT DEFAULT NULL,
+    `deleted` TINYINT(1) NOT NULL DEFAULT 0,
+    `created` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `last_updated` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`citizenid`),
+    KEY `idx_ox_characters_license` (`license`),
+    CONSTRAINT `fk_ox_characters_license` FOREIGN KEY (`license`) REFERENCES `ox_players` (`license`) ON DELETE CASCADE
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
