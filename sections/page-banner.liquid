@@ -1,0 +1,38 @@
+<section class="page-banner">
+  <div class="container">
+    <p class="eyebrow">{{ section.settings.eyebrow }}</p>
+    <h1>{{ page.title | default: section.settings.fallback_heading }}</h1>
+    {%- if section.settings.text != blank -%}
+      <div class="section__text">{{ section.settings.text }}</div>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Paginabanner",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Kicker"
+    },
+    {
+      "type": "text",
+      "id": "fallback_heading",
+      "label": "Titel (indien geen paginatitel)",
+      "default": "Pagina"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Tekst"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Paginabanner"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,79 @@
+<header class="site-header">
+  <div class="container site-header__inner">
+    <a href="{{ routes.root_url }}" class="site-header__logo">
+      {%- if settings.logo != blank -%}
+        <img
+          src="{{ settings.logo | image_url: width: 320 }}"
+          alt="{{ shop.name }}"
+          width="{{ settings.logo_width }}"
+          style="max-width: {{ settings.logo_width }}px;"
+          loading="eager"
+        >
+      {%- else -%}
+        <span class="site-header__logo-text">{{ shop.name }}</span>
+      {%- endif -%}
+    </a>
+
+    <nav class="site-header__nav" aria-label="{{ 'header.menu' | t }}">
+      <ul role="list">
+        {%- for link in section.settings.menu.links -%}
+          <li><a href="{{ link.url }}"{% if link.active %} aria-current="page"{% endif %}>{{ link.title }}</a></li>
+        {%- endfor -%}
+      </ul>
+    </nav>
+
+    <div class="site-header__actions">
+      {%- if settings.company_phone != blank -%}
+        <a class="site-header__phone" href="tel:{{ settings.company_phone | replace: ' ', '' }}">
+          {%- render 'icon-phone' -%}
+          <span>{{ settings.company_phone }}</span>
+        </a>
+      {%- endif -%}
+      {%- if section.settings.cta_url != blank and section.settings.cta_label != blank -%}
+        <a href="{{ section.settings.cta_url }}" class="button button--small">{{ section.settings.cta_label }}</a>
+      {%- endif -%}
+      <button type="button" class="site-header__burger" aria-expanded="false" aria-controls="MobileNav" aria-label="{{ 'header.menu' | t }}">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+
+  <div id="MobileNav" class="mobile-nav" hidden>
+    <ul role="list">
+      {%- for link in section.settings.menu.links -%}
+        <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+      {%- endfor -%}
+    </ul>
+    {%- if settings.company_phone != blank -%}
+      <a class="button button--small" href="tel:{{ settings.company_phone | replace: ' ', '' }}">
+        {{ 'header.call_us' | t }}: {{ settings.company_phone }}
+      </a>
+    {%- endif -%}
+  </div>
+</header>
+
+{% schema %}
+{
+  "name": "Header",
+  "settings": [
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Menu",
+      "default": "main-menu"
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "Knoptekst",
+      "default": "Vraag advies aan"
+    },
+    {
+      "type": "url",
+      "id": "cta_url",
+      "label": "Knoplink",
+      "default": "/pages/contact"
+    }
+  ]
+}
+{% endschema %}

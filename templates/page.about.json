@@ -1,0 +1,68 @@
+{
+  "sections": {
+    "banner": {
+      "type": "page-banner",
+      "settings": {
+        "eyebrow": "Over ons",
+        "fallback_heading": "Wie wij zijn",
+        "text": "<p>Maak kennis met het team achter uw comfortabele binnenklimaat.</p>"
+      }
+    },
+    "main": {
+      "type": "main-page",
+      "settings": {}
+    },
+    "story": {
+      "type": "image-with-text",
+      "settings": {
+        "layout": "image_left",
+        "eyebrow": "Ons verhaal",
+        "heading": "Vakmanschap met persoonlijke aandacht",
+        "text": "<p>Wij zijn gestart vanuit de overtuiging dat airconditioning advies eerlijker en persoonlijker kan. Geen verkooppraatjes, maar een vakkundig advies dat past bij uw situatie en budget. Inmiddels hebben we tientallen woningen en bedrijven voorzien van een comfortabel binnenklimaat, en dat doen we het liefst nog jaren.</p>"
+      }
+    },
+    "values": {
+      "type": "values",
+      "blocks": {
+        "value-1": {
+          "type": "value",
+          "settings": {
+            "title": "Kwaliteit zonder compromis",
+            "text": "<p>We werken met A-merken en volgens de geldende richtlijnen, voor een installatie waar u jarenlang op kunt rekenen.</p>"
+          }
+        },
+        "value-2": {
+          "type": "value",
+          "settings": {
+            "title": "Eerlijk en transparant",
+            "text": "<p>Duidelijke afspraken, heldere communicatie en geen verrassingen achteraf.</p>"
+          }
+        },
+        "value-3": {
+          "type": "value",
+          "settings": {
+            "title": "Duurzaam denken",
+            "text": "<p>We adviseren altijd de meest energiezuinige oplossing die past bij uw situatie.</p>"
+          }
+        },
+        "value-4": {
+          "type": "value",
+          "settings": {
+            "title": "Persoonlijke aandacht",
+            "text": "<p>Elke klant krijgt een vast aanspreekpunt en advies dat echt aansluit bij de situatie.</p>"
+          }
+        }
+      },
+      "block_order": ["value-1", "value-2", "value-3", "value-4"],
+      "settings": {
+        "eyebrow": "Onze waarden",
+        "heading": "Waar wij voor staan"
+      }
+    },
+    "cta": {
+      "type": "cta-banner",
+      "settings": {}
+    }
+  },
+  "order": ["banner", "main", "story", "values", "cta"]
+}

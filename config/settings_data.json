@@ -1,0 +1,20 @@
+{
+  "current": "Default",
+  "presets": {
+    "Default": {
+      "company_phone": "085 401 2345",
+      "company_email": "info@voorbeeld-airco.nl",
+      "company_address": "Industrieweg 12, 3542 AB Utrecht",
+      "company_hours": "Ma t/m vr: 08:00 - 17:00",
+      "logo_width": 160,
+      "color_primary": "#0E5C7A",
+      "color_primary_dark": "#093E52",
+      "color_accent": "#36B5A0",
+      "color_text": "#1B2430",
+      "color_background": "#FFFFFF",
+      "color_surface": "#F4F8F9",
+      "type_header_font": "assistant_n4",
+      "type_body_font": "assistant_n4"
+    }
+  }
+}

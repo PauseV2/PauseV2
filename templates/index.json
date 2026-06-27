@@ -1,0 +1,209 @@
+{
+  "sections": {
+    "hero": {
+      "type": "hero",
+      "settings": {
+        "eyebrow": "Airconditioning specialist",
+        "heading": "Comfortabel binnenklimaat, het hele jaar rond",
+        "text": "<p>Wij adviseren, installeren en onderhouden airconditioning voor woningen en bedrijven. Vakkundig, persoonlijk en zonder verrassingen achteraf.</p>",
+        "button_label": "Vraag vrijblijvend advies aan",
+        "button_url": "/pages/contact"
+      }
+    },
+    "benefits": {
+      "type": "benefits",
+      "blocks": {
+        "benefit-1": {
+          "type": "benefit",
+          "settings": {
+            "title": "Gecertificeerde installateurs",
+            "text": "<p>Al onze monteurs zijn F-gassen gecertificeerd en werken volgens de geldende normen.</p>"
+          }
+        },
+        "benefit-2": {
+          "type": "benefit",
+          "settings": {
+            "title": "Eerlijk en persoonlijk advies",
+            "text": "<p>Geen verkooppraatjes, wel een oplossing die echt bij u past.</p>"
+          }
+        },
+        "benefit-3": {
+          "type": "benefit",
+          "settings": {
+            "title": "Energiezuinige systemen",
+            "text": "<p>Wij adviseren over de meest efficiente en duurzame oplossing voor uw situatie.</p>"
+          }
+        },
+        "benefit-4": {
+          "type": "benefit",
+          "settings": {
+            "title": "Nette en snelle installatie",
+            "text": "<p>Vakwerk binnen de afgesproken tijd, met respect voor uw woning of pand.</p>"
+          }
+        },
+        "benefit-5": {
+          "type": "benefit",
+          "settings": {
+            "title": "Service en onderhoud",
+            "text": "<p>Ook na de installatie staan we voor u klaar met onderhoud en storingsdienst.</p>"
+          }
+        },
+        "benefit-6": {
+          "type": "benefit",
+          "settings": {
+            "title": "Lokale betrokkenheid",
+            "text": "<p>Korte lijnen en persoonlijk contact, geen anoniem callcenter.</p>"
+          }
+        }
+      },
+      "block_order": ["benefit-1", "benefit-2", "benefit-3", "benefit-4", "benefit-5", "benefit-6"],
+      "settings": {
+        "eyebrow": "Waarom kiezen voor ons",
+        "heading": "De voordelen van werken met ons",
+        "text": ""
+      }
+    },
+    "image_with_text": {
+      "type": "image-with-text",
+      "settings": {
+        "layout": "image_left",
+        "eyebrow": "Over ons",
+        "heading": "Wie wij zijn",
+        "text": "<p>Wij zijn een team van vakmensen met een passie voor een gezond en comfortabel binnenklimaat. Vanuit ons vak willen we ontzorgen: van eerste advies tot jarenlange nazorg.</p>",
+        "button_label": "Lees meer over ons",
+        "button_url": "/pages/over-ons"
+      }
+    },
+    "how_we_work": {
+      "type": "how-we-work",
+      "blocks": {
+        "step-1": {
+          "type": "step",
+          "settings": {
+            "title": "Vrijblijvend adviesgesprek",
+            "text": "<p>We bespreken uw situatie, wensen en mogelijkheden, telefonisch of bij u op locatie.</p>"
+          }
+        },
+        "step-2": {
+          "type": "step",
+          "settings": {
+            "title": "Opname en advies op maat",
+            "text": "<p>Onze adviseur brengt de ruimte in kaart en stelt een passende oplossing voor.</p>"
+          }
+        },
+        "step-3": {
+          "type": "step",
+          "settings": {
+            "title": "Persoonlijk voorstel",
+            "text": "<p>U ontvangt een duidelijk en transparant voorstel, zonder kleine lettertjes.</p>"
+          }
+        },
+        "step-4": {
+          "type": "step",
+          "settings": {
+            "title": "Professionele installatie",
+            "text": "<p>Onze gecertificeerde monteurs plaatsen het systeem vakkundig en netjes.</p>"
+          }
+        },
+        "step-5": {
+          "type": "step",
+          "settings": {
+            "title": "Nazorg en onderhoud",
+            "text": "<p>Ook na de installatie kunt u op ons rekenen voor onderhoud en service.</p>"
+          }
+        }
+      },
+      "block_order": ["step-1", "step-2", "step-3", "step-4", "step-5"],
+      "settings": {
+        "eyebrow": "Onze werkwijze",
+        "heading": "Zo werken wij",
+        "text": ""
+      }
+    },
+    "services": {
+      "type": "services-list",
+      "blocks": {
+        "service-1": {
+          "type": "service",
+          "settings": {
+            "title": "Airco installatie",
+            "text": "<p>Vakkundige installatie van airconditioning bij woningen en bedrijven, inclusief advies op maat.</p>"
+          }
+        },
+        "service-2": {
+          "type": "service",
+          "settings": {
+            "title": "Onderhoud en service",
+            "text": "<p>Periodiek onderhoud houdt uw systeem efficient en verlengt de levensduur.</p>"
+          }
+        },
+        "service-3": {
+          "type": "service",
+          "settings": {
+            "title": "Advies en energiebesparing",
+            "text": "<p>Onafhankelijk advies over de beste oplossing voor uw situatie en energieverbruik.</p>"
+          }
+        },
+        "service-4": {
+          "type": "service",
+          "settings": {
+            "title": "Storingsdienst",
+            "text": "<p>Snel geholpen bij storingen, met persoonlijk contact en duidelijke uitleg.</p>"
+          }
+        }
+      },
+      "block_order": ["service-1", "service-2", "service-3", "service-4"],
+      "settings": {
+        "eyebrow": "Wat wij doen",
+        "heading": "Onze diensten",
+        "text": "",
+        "button_label": "Neem contact op",
+        "button_url": "/pages/contact"
+      }
+    },
+    "testimonials": {
+      "type": "testimonials",
+      "blocks": {
+        "testimonial-1": {
+          "type": "testimonial",
+          "settings": {
+            "quote": "Duidelijk advies, nette installatie en goed bereikbaar voor vragen achteraf.",
+            "name": "Familie de Vries",
+            "location": "Utrecht"
+          }
+        },
+        "testimonial-2": {
+          "type": "testimonial",
+          "settings": {
+            "quote": "Eindelijk een bedrijf dat doet wat het zegt. Geen verkooppraatjes, gewoon goed advies.",
+            "name": "M. Jansen",
+            "location": "Amersfoort"
+          }
+        },
+        "testimonial-3": {
+          "type": "testimonial",
+          "settings": {
+            "quote": "Snel een afspraak kunnen maken en het onderhoud verloopt altijd vlekkeloos.",
+            "name": "Restaurant De Linde",
+            "location": "Zeist"
+          }
+        }
+      },
+      "block_order": ["testimonial-1", "testimonial-2", "testimonial-3"],
+      "settings": {
+        "eyebrow": "Ervaringen",
+        "heading": "Wat klanten over ons zeggen"
+      }
+    },
+    "cta": {
+      "type": "cta-banner",
+      "settings": {
+        "heading": "Liever direct contact?",
+        "text": "<p>Bel ons gerust, we denken graag vrijblijvend met u mee.</p>",
+        "button_label": "Stel uw vraag via het formulier",
+        "button_url": "/pages/contact"
+      }
+    }
+  },
+  "order": ["hero", "benefits", "image_with_text", "how_we_work", "services", "testimonials", "cta"]
+}

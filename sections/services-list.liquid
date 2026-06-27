@@ -1,0 +1,137 @@
+<section class="section services">
+  <div class="container">
+    <div class="section__heading">
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="eyebrow">{{ section.settings.eyebrow }}</p>
+      {%- endif -%}
+      {%- if section.settings.heading != blank -%}
+        <h2>{{ section.settings.heading }}</h2>
+      {%- endif -%}
+      {%- if section.settings.text != blank -%}
+        <div class="section__text">{{ section.settings.text }}</div>
+      {%- endif -%}
+    </div>
+
+    <div class="services__grid">
+      {%- for block in section.blocks -%}
+        {%- case block.type -%}
+          {%- when 'service' -%}
+            <div class="service-card" {{ block.shopify_attributes }}>
+              {%- if block.settings.image != blank -%}
+                <div class="service-card__media">
+                  <img src="{{ block.settings.image | image_url: width: 600 }}" alt="" loading="lazy" width="600" height="400">
+                </div>
+              {%- endif -%}
+              <h3>{{ block.settings.title }}</h3>
+              {%- if block.settings.text != blank -%}
+                <div class="service-card__text">{{ block.settings.text }}</div>
+              {%- endif -%}
+            </div>
+        {%- endcase -%}
+      {%- endfor -%}
+    </div>
+
+    {%- if section.settings.button_label != blank -%}
+      <div class="services__cta">
+        <a href="{{ section.settings.button_url }}" class="button">{{ section.settings.button_label }}</a>
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Diensten",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Kicker",
+      "default": "Wat wij doen"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Titel",
+      "default": "Onze diensten"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Tekst"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Knoptekst",
+      "default": "Neem contact op"
+    },
+    {
+      "type": "url",
+      "id": "button_url",
+      "label": "Knoplink",
+      "default": "/pages/contact"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "service",
+      "name": "Dienst",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Afbeelding"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Titel",
+          "default": "Airco installatie"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Tekst",
+          "default": "<p>Vakkundige installatie van airconditioning bij woningen en bedrijven, inclusief advies op maat.</p>"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Diensten",
+      "blocks": [
+        {
+          "type": "service",
+          "settings": {
+            "title": "Airco installatie",
+            "text": "<p>Vakkundige installatie van airconditioning bij woningen en bedrijven, inclusief advies op maat.</p>"
+          }
+        },
+        {
+          "type": "service",
+          "settings": {
+            "title": "Onderhoud en service",
+            "text": "<p>Periodiek onderhoud houdt uw systeem efficient en verlengt de levensduur.</p>"
+          }
+        },
+        {
+          "type": "service",
+          "settings": {
+            "title": "Advies en energiebesparing",
+            "text": "<p>Onafhankelijk advies over de beste oplossing voor uw situatie en energieverbruik.</p>"
+          }
+        },
+        {
+          "type": "service",
+          "settings": {
+            "title": "Storingsdienst",
+            "text": "<p>Snel geholpen bij storingen, met persoonlijk contact en duidelijke uitleg.</p>"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

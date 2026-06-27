@@ -1,0 +1,28 @@
+{%- comment -%}
+  Renders social links from theme settings. Hidden when no URLs are set.
+{%- endcomment -%}
+{%- if settings.social_facebook != blank or settings.social_instagram != blank or settings.social_linkedin != blank -%}
+  <ul class="social-icons" role="list">
+    {%- if settings.social_facebook != blank -%}
+      <li>
+        <a href="{{ settings.social_facebook }}" target="_blank" rel="noopener" aria-label="Facebook">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M22 12a10 10 0 1 0-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.5 1.49-3.89 3.78-3.89 1.1 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.78l-.44 2.89h-2.34v6.99A10 10 0 0 0 22 12"/></svg>
+        </a>
+      </li>
+    {%- endif -%}
+    {%- if settings.social_instagram != blank -%}
+      <li>
+        <a href="{{ settings.social_instagram }}" target="_blank" rel="noopener" aria-label="Instagram">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+        </a>
+      </li>
+    {%- endif -%}
+    {%- if settings.social_linkedin != blank -%}
+      <li>
+        <a href="{{ settings.social_linkedin }}" target="_blank" rel="noopener" aria-label="LinkedIn">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14zM8.34 9.5H5.67V18h2.67V9.5zM7 8.31a1.54 1.54 0 1 0 0-3.08 1.54 1.54 0 0 0 0 3.08zM18.33 18v-4.73c0-2.53-1.35-3.71-3.15-3.71a2.72 2.72 0 0 0-2.46 1.35h-.04V9.5h-2.56c.03.73 0 8.5 0 8.5h2.67v-4.75c0-.25.02-.5.1-.68.21-.5.68-1.03 1.49-1.03 1.05 0 1.47.8 1.47 1.97V18h2.68z"/></svg>
+        </a>
+      </li>
+    {%- endif -%}
+  </ul>
+{%- endif -%}

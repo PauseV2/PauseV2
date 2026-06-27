@@ -1,0 +1,145 @@
+[
+  {
+    "name": "theme_info",
+    "theme_name": "Airco Informatie",
+    "theme_version": "1.0.0",
+    "theme_author": "Claude",
+    "theme_documentation_url": "",
+    "theme_support_url": ""
+  },
+  {
+    "name": "Bedrijfsgegevens",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Contactgegevens"
+      },
+      {
+        "type": "text",
+        "id": "company_phone",
+        "label": "Telefoonnummer",
+        "default": "085 401 2345",
+        "info": "Wordt overal getoond als klikbare 'bel ons' link."
+      },
+      {
+        "type": "text",
+        "id": "company_email",
+        "label": "E-mailadres",
+        "default": "info@voorbeeld-airco.nl"
+      },
+      {
+        "type": "text",
+        "id": "company_address",
+        "label": "Adres",
+        "default": "Industrieweg 12, 3542 AB Utrecht"
+      },
+      {
+        "type": "text",
+        "id": "company_hours",
+        "label": "Openingstijden",
+        "default": "Ma t/m vr: 08:00 - 17:00"
+      },
+      {
+        "type": "header",
+        "content": "Logo"
+      },
+      {
+        "type": "image_picker",
+        "id": "logo",
+        "label": "Logo"
+      },
+      {
+        "type": "range",
+        "id": "logo_width",
+        "label": "Logobreedte",
+        "min": 80,
+        "max": 300,
+        "step": 10,
+        "default": 160,
+        "unit": "px"
+      },
+      {
+        "type": "image_picker",
+        "id": "favicon",
+        "label": "Favicon"
+      },
+      {
+        "type": "header",
+        "content": "Social media"
+      },
+      {
+        "type": "text",
+        "id": "social_facebook",
+        "label": "Facebook URL"
+      },
+      {
+        "type": "text",
+        "id": "social_instagram",
+        "label": "Instagram URL"
+      },
+      {
+        "type": "text",
+        "id": "social_linkedin",
+        "label": "LinkedIn URL"
+      }
+    ]
+  },
+  {
+    "name": "Kleuren",
+    "settings": [
+      {
+        "type": "color",
+        "id": "color_primary",
+        "label": "Primaire kleur",
+        "default": "#0E5C7A"
+      },
+      {
+        "type": "color",
+        "id": "color_primary_dark",
+        "label": "Primaire kleur (donker)",
+        "default": "#093E52"
+      },
+      {
+        "type": "color",
+        "id": "color_accent",
+        "label": "Accentkleur",
+        "default": "#36B5A0"
+      },
+      {
+        "type": "color",
+        "id": "color_text",
+        "label": "Tekstkleur",
+        "default": "#1B2430"
+      },
+      {
+        "type": "color",
+        "id": "color_background",
+        "label": "Achtergrondkleur",
+        "default": "#FFFFFF"
+      },
+      {
+        "type": "color",
+        "id": "color_surface",
+        "label": "Vlakkleur (secties)",
+        "default": "#F4F8F9"
+      }
+    ]
+  },
+  {
+    "name": "Typografie",
+    "settings": [
+      {
+        "type": "font_picker",
+        "id": "type_header_font",
+        "label": "Lettertype koppen",
+        "default": "assistant_n4"
+      },
+      {
+        "type": "font_picker",
+        "id": "type_body_font",
+        "label": "Lettertype tekst",
+        "default": "assistant_n4"
+      }
+    ]
+  }
+]

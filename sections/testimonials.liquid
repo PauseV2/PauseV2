@@ -1,0 +1,105 @@
+<section class="section testimonials">
+  <div class="container">
+    <div class="section__heading">
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="eyebrow">{{ section.settings.eyebrow }}</p>
+      {%- endif -%}
+      {%- if section.settings.heading != blank -%}
+        <h2>{{ section.settings.heading }}</h2>
+      {%- endif -%}
+    </div>
+
+    <div class="testimonials__grid">
+      {%- for block in section.blocks -%}
+        {%- case block.type -%}
+          {%- when 'testimonial' -%}
+            <blockquote class="testimonial-card" {{ block.shopify_attributes }}>
+              <p>&ldquo;{{ block.settings.quote }}&rdquo;</p>
+              <footer>
+                <span class="testimonial-card__name">{{ block.settings.name }}</span>
+                {%- if block.settings.location != blank -%}
+                  <span class="testimonial-card__location">{{ block.settings.location }}</span>
+                {%- endif -%}
+              </footer>
+            </blockquote>
+        {%- endcase -%}
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Reacties van klanten",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Kicker",
+      "default": "Ervaringen"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Titel",
+      "default": "Wat klanten over ons zeggen"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "testimonial",
+      "name": "Reactie",
+      "settings": [
+        {
+          "type": "textarea",
+          "id": "quote",
+          "label": "Citaat",
+          "default": "Duidelijk advies, nette installatie en goed bereikbaar voor vragen achteraf."
+        },
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Naam",
+          "default": "Tevreden klant"
+        },
+        {
+          "type": "text",
+          "id": "location",
+          "label": "Plaats"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Reacties van klanten",
+      "blocks": [
+        {
+          "type": "testimonial",
+          "settings": {
+            "quote": "Duidelijk advies, nette installatie en goed bereikbaar voor vragen achteraf.",
+            "name": "Familie de Vries",
+            "location": "Utrecht"
+          }
+        },
+        {
+          "type": "testimonial",
+          "settings": {
+            "quote": "Eindelijk een bedrijf dat doet wat het zegt. Geen verkooppraatjes, gewoon goed advies.",
+            "name": "M. Jansen",
+            "location": "Amersfoort"
+          }
+        },
+        {
+          "type": "testimonial",
+          "settings": {
+            "quote": "Snel een afspraak kunnen maken en het onderhoud verloopt altijd vlekkeloos.",
+            "name": "Restaurant De Linde",
+            "location": "Zeist"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

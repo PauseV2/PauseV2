@@ -1,0 +1,74 @@
+<footer class="site-footer">
+  <div class="container site-footer__grid">
+    <div class="site-footer__about">
+      {%- if settings.logo != blank -%}
+        <img src="{{ settings.logo | image_url: width: 240 }}" alt="{{ shop.name }}" width="160" loading="lazy">
+      {%- else -%}
+        <p class="site-footer__logo-text">{{ shop.name }}</p>
+      {%- endif -%}
+      {%- if section.settings.about_text != blank -%}
+        <div class="site-footer__text">{{ section.settings.about_text }}</div>
+      {%- endif -%}
+      {%- render 'social-icons' -%}
+    </div>
+
+    <div class="site-footer__nav">
+      <h3>{{ 'footer.navigation' | t }}</h3>
+      <ul role="list">
+        {%- for link in section.settings.menu.links -%}
+          <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+        {%- endfor -%}
+      </ul>
+    </div>
+
+    <div class="site-footer__contact">
+      <h3>{{ 'footer.contact' | t }}</h3>
+      <ul role="list">
+        {%- if settings.company_phone != blank -%}
+          <li>
+            <a href="tel:{{ settings.company_phone | replace: ' ', '' }}">
+              {%- render 'icon-phone' -%}<span>{{ settings.company_phone }}</span>
+            </a>
+          </li>
+        {%- endif -%}
+        {%- if settings.company_email != blank -%}
+          <li>
+            <a href="mailto:{{ settings.company_email }}">
+              {%- render 'icon-mail' -%}<span>{{ settings.company_email }}</span>
+            </a>
+          </li>
+        {%- endif -%}
+        {%- if settings.company_address != blank -%}
+          <li>{%- render 'icon-map-pin' -%}<span>{{ settings.company_address }}</span></li>
+        {%- endif -%}
+        {%- if settings.company_hours != blank -%}
+          <li>{%- render 'icon-clock' -%}<span>{{ settings.company_hours }}</span></li>
+        {%- endif -%}
+      </ul>
+    </div>
+  </div>
+
+  <div class="container site-footer__bottom">
+    <p>&copy; {{ 'now' | date: '%Y' }} {{ shop.name }}. {{ 'footer.rights' | t }}</p>
+  </div>
+</footer>
+
+{% schema %}
+{
+  "name": "Footer",
+  "settings": [
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Menu",
+      "default": "footer"
+    },
+    {
+      "type": "richtext",
+      "id": "about_text",
+      "label": "Korte omschrijving",
+      "default": "<p>Specialist in airconditioning: advies, installatie en onderhoud voor woning en bedrijf.</p>"
+    }
+  ]
+}
+{% endschema %}

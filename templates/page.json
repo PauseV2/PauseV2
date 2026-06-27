@@ -1,0 +1,13 @@
+{
+  "sections": {
+    "banner": {
+      "type": "page-banner",
+      "settings": {}
+    },
+    "main": {
+      "type": "main-page",
+      "settings": {}
+    }
+  },
+  "order": ["banner", "main"]
+}

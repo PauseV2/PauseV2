@@ -1,0 +1,35 @@
+{
+  "general": {
+    "skip_to_content": "Direct naar inhoud",
+    "meta": {
+      "tags": "Getagd \"{{ tags }}\"",
+      "page": "Pagina {{ page }}"
+    },
+    "password_page": {
+      "coming_soon": "Onze nieuwe website komt er binnenkort aan."
+    }
+  },
+  "header": {
+    "menu": "Menu",
+    "close_menu": "Menu sluiten",
+    "call_us": "Bel ons",
+    "request_quote": "Vraag advies aan"
+  },
+  "footer": {
+    "navigation": "Navigatie",
+    "contact": "Contact",
+    "follow_us": "Volg ons",
+    "rights": "Alle rechten voorbehouden."
+  },
+  "contact": {
+    "form": {
+      "name": "Naam",
+      "email": "E-mailadres",
+      "phone": "Telefoonnummer",
+      "message": "Uw vraag of bericht",
+      "submit": "Verstuur bericht",
+      "success": "Bedankt voor uw bericht! We nemen zo snel mogelijk contact met u op.",
+      "error": "Er is iets misgegaan bij het versturen. Controleer uw gegevens en proberen het opnieuw."
+    }
+  }
+}

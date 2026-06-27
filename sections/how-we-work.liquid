@@ -1,0 +1,119 @@
+<section class="section how-it-works">
+  <div class="container">
+    <div class="section__heading">
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="eyebrow">{{ section.settings.eyebrow }}</p>
+      {%- endif -%}
+      {%- if section.settings.heading != blank -%}
+        <h2>{{ section.settings.heading }}</h2>
+      {%- endif -%}
+      {%- if section.settings.text != blank -%}
+        <div class="section__text">{{ section.settings.text }}</div>
+      {%- endif -%}
+    </div>
+
+    <ol class="steps">
+      {%- for block in section.blocks -%}
+        {%- case block.type -%}
+          {%- when 'step' -%}
+            <li class="step" {{ block.shopify_attributes }}>
+              <span class="step__number">{{ forloop.index }}</span>
+              <div class="step__content">
+                <h3>{{ block.settings.title }}</h3>
+                {%- if block.settings.text != blank -%}
+                  <p>{{ block.settings.text }}</p>
+                {%- endif -%}
+              </div>
+            </li>
+        {%- endcase -%}
+      {%- endfor -%}
+    </ol>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Hoe wij werken",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Kicker",
+      "default": "Onze werkwijze"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Titel",
+      "default": "Zo werken wij"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Tekst"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "step",
+      "name": "Stap",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Titel",
+          "default": "Vrijblijvend adviesgesprek"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Tekst",
+          "default": "<p>We bespreken uw situatie en wensen, telefonisch of bij u op locatie.</p>"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Hoe wij werken",
+      "blocks": [
+        {
+          "type": "step",
+          "settings": {
+            "title": "Vrijblijvend adviesgesprek",
+            "text": "<p>We bespreken uw situatie, wensen en mogelijkheden, telefonisch of bij u op locatie.</p>"
+          }
+        },
+        {
+          "type": "step",
+          "settings": {
+            "title": "Opname en advies op maat",
+            "text": "<p>Onze adviseur brengt de ruimte in kaart en stelt een passende oplossing voor.</p>"
+          }
+        },
+        {
+          "type": "step",
+          "settings": {
+            "title": "Persoonlijk voorstel",
+            "text": "<p>U ontvangt een duidelijk en transparant voorstel, zonder kleine lettertjes.</p>"
+          }
+        },
+        {
+          "type": "step",
+          "settings": {
+            "title": "Professionele installatie",
+            "text": "<p>Onze gecertificeerde monteurs plaatsen het systeem vakkundig en netjes.</p>"
+          }
+        },
+        {
+          "type": "step",
+          "settings": {
+            "title": "Nazorg en onderhoud",
+            "text": "<p>Ook na de installatie kunt u op ons rekenen voor onderhoud en service.</p>"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
