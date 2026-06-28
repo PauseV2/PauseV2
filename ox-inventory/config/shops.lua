@@ -7,7 +7,7 @@ Shops = {
         },
         items = {
             { name = 'water_bottle', price = 5 },
-            { name = 'sandwich', price = 8 },
+            { name = 'burger', price = 8 },
             { name = 'phone', price = 300 },
             { name = 'bandage', price = 15 },
         },

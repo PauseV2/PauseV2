@@ -64,6 +64,8 @@ function OxInv.Get(id)
 end
 
 function OxInv.Save(inv)
+    if inv.ephemeral then return end -- ground bags never touch the DB
+
     local list = {}
 
     for _, entry in pairs(inv.items) do
@@ -71,6 +73,45 @@ function OxInv.Save(inv)
     end
 
     OxInvDB.Save(inv.id, inv.type, list)
+end
+
+-- Ground items: created on drop, never DB-backed, destroyed once emptied.
+function OxInv.CreateEphemeral(id, label, maxWeight, slots, coords)
+    local inv = {
+        id = id,
+        type = 'ground',
+        label = label,
+        maxWeight = maxWeight,
+        slots = slots,
+        items = {},
+        coords = coords,
+        ephemeral = true,
+    }
+
+    OxInv.cache[id] = inv
+    return inv
+end
+
+function OxInv.Destroy(id)
+    OxInv.cache[id] = nil
+end
+
+function OxInv.IsEmpty(inv)
+    for _ in pairs(inv.items) do
+        return false
+    end
+
+    return true
+end
+
+function OxInv.FindEmptySlot(inv)
+    for slot = 1, inv.slots do
+        if not inv.items[slot] then
+            return slot
+        end
+    end
+
+    return nil
 end
 
 function OxInv.Close(id)
@@ -196,6 +237,8 @@ function OxInv.Snapshot(id)
             metadata = entry.metadata,
             label = def and def.label or entry.name,
             weight = def and def.weight or 0,
+            icon = def and def.icon or '❓',
+            description = def and def.description or '',
         }
     end
 

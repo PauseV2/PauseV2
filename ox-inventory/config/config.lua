@@ -13,3 +13,5 @@ Config.Stashes = {
 }
 
 Config.StashRange = 2.0 -- meters, how close a player must be to open a stash
+Config.GiveRange = 3.0 -- meters, how close another player must be to receive a give
+Config.DropProp = 'prop_paper_bag_01' -- world prop used for every dropped item, regardless of item type
