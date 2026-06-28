@@ -4,7 +4,6 @@ Items = {
         weight = 1800,
         stack = 1,
         type = 'weapon',
-        icon = '🔫',
         description = 'A standard pistol. Reliable and widely used.',
     },
     bandage = {
@@ -12,7 +11,6 @@ Items = {
         weight = 150,
         stack = 10,
         type = 'medical',
-        icon = '🩹',
         description = 'Stops the bleeding.',
     },
     water_bottle = {
@@ -20,7 +18,6 @@ Items = {
         weight = 500,
         stack = 20,
         type = 'drink',
-        icon = '💧',
         description = 'A refreshing bottle of water.',
     },
     bread = {
@@ -28,7 +25,6 @@ Items = {
         weight = 400,
         stack = 10,
         type = 'food',
-        icon = '🍞',
         description = 'A fresh loaf of bread.',
     },
     phone = {
@@ -36,7 +32,6 @@ Items = {
         weight = 200,
         stack = 1,
         type = 'item',
-        icon = '📱',
         description = 'Your trusty smartphone.',
     },
     radio = {
@@ -44,7 +39,6 @@ Items = {
         weight = 1200,
         stack = 1,
         type = 'item',
-        icon = '📻',
         description = 'Two-way radio for staying in touch.',
     },
     repair_kit = {
@@ -52,7 +46,6 @@ Items = {
         weight = 2500,
         stack = 3,
         type = 'item',
-        icon = '🧰',
         description = 'Patches up a damaged vehicle.',
     },
     lockpick_set = {
@@ -60,7 +53,6 @@ Items = {
         weight = 600,
         stack = 3,
         type = 'item',
-        icon = '🗝️',
         description = "A set of tools for getting into places you shouldn't.",
     },
     medkit = {
@@ -68,7 +60,6 @@ Items = {
         weight = 2000,
         stack = 3,
         type = 'medical',
-        icon = '🩺',
         description = 'Treats serious injuries.',
     },
     energy_drink = {
@@ -76,7 +67,6 @@ Items = {
         weight = 400,
         stack = 10,
         type = 'drink',
-        icon = '⚡',
         description = 'A jolt of caffeine and sugar.',
     },
     chocolate_bar = {
@@ -84,7 +74,6 @@ Items = {
         weight = 300,
         stack = 10,
         type = 'food',
-        icon = '🍫',
         description = 'A sweet snack.',
     },
     money_bag = {
@@ -92,7 +81,6 @@ Items = {
         weight = 1000,
         stack = 5,
         type = 'item',
-        icon = '💰',
         description = 'A bag stuffed with cash.',
     },
     id_card = {
@@ -100,7 +88,6 @@ Items = {
         weight = 50,
         stack = 1,
         type = 'item',
-        icon = '🪪',
         description = 'Government-issued identification.',
     },
     gold_chain = {
@@ -108,7 +95,6 @@ Items = {
         weight = 200,
         stack = 5,
         type = 'item',
-        icon = '📿',
         description = 'Worth a fair bit if you can find a buyer.',
     },
     hat = {
@@ -116,17 +102,13 @@ Items = {
         weight = 200,
         stack = 1,
         type = 'item',
-        icon = '🧢',
         description = 'Keeps the sun out of your eyes.',
     },
     gloves = {
         label = 'Gloves',
         weight = 250,
         stack = 1,
-        type = 'clothing',
-        slot = 'gloves',
-        component = { component = 3, drawable = 1, texture = 0 },
-        icon = '🧤',
+        type = 'item',
         description = 'Good for keeping your hands clean.',
     },
     ammo_9mm = {
@@ -134,7 +116,6 @@ Items = {
         weight = 10,
         stack = 100,
         type = 'ammo',
-        icon = '🔸',
         description = 'Standard 9mm pistol ammunition.',
     },
     knife = {
@@ -142,7 +123,6 @@ Items = {
         weight = 300,
         stack = 1,
         type = 'weapon',
-        icon = '🔪',
         description = 'Sharp and dangerous in the wrong hands.',
     },
     zip_tie = {
@@ -150,7 +130,6 @@ Items = {
         weight = 50,
         stack = 20,
         type = 'item',
-        icon = '🔗',
         description = 'Handy for restraining someone.',
     },
     cigarettes = {
@@ -158,7 +137,6 @@ Items = {
         weight = 50,
         stack = 20,
         type = 'item',
-        icon = '🚬',
         description = "Bad for you, but you don't care.",
     },
     lighter = {
@@ -166,7 +144,6 @@ Items = {
         weight = 50,
         stack = 5,
         type = 'item',
-        icon = '🔥',
         description = 'A reliable flame.',
     },
     burger = {
@@ -174,152 +151,6 @@ Items = {
         weight = 400,
         stack = 10,
         type = 'food',
-        icon = '🍔',
         description = 'Smells decent.',
-    },
-
-    -- Clothing: component/prop drawable+texture ids are placeholders (every
-    -- value is 0/1) since we don't have a real clothing catalog yet - swap
-    -- these once the actual ped model assets are chosen. `component` maps to
-    -- SetPedComponentVariation, `prop` to SetPedPropIndex; an item with
-    -- neither (rings, badge) still occupies its clothing slot but has no
-    -- visual on the ped, matching what the base game ped models can render.
-    mask = {
-        label = 'Mask',
-        weight = 150,
-        stack = 1,
-        type = 'clothing',
-        slot = 'mask',
-        component = { component = 1, drawable = 1, texture = 0 },
-        icon = '🎭',
-        description = 'Covers your face.',
-    },
-    pants = {
-        label = 'Pants',
-        weight = 300,
-        stack = 1,
-        type = 'clothing',
-        slot = 'pants',
-        component = { component = 4, drawable = 1, texture = 0 },
-        icon = '👖',
-        description = 'A pair of pants.',
-    },
-    necklace = {
-        label = 'Necklace',
-        weight = 100,
-        stack = 1,
-        type = 'clothing',
-        slot = 'necklace',
-        component = { component = 7, drawable = 1, texture = 0 },
-        icon = '📿',
-        description = 'A nice piece of jewelry.',
-    },
-    shirt = {
-        label = 'Shirt',
-        weight = 250,
-        stack = 1,
-        type = 'clothing',
-        slot = 'shirt',
-        component = { component = 11, drawable = 1, texture = 0 },
-        icon = '👕',
-        description = 'A plain shirt.',
-    },
-    shoes = {
-        label = 'Shoes',
-        weight = 350,
-        stack = 1,
-        type = 'clothing',
-        slot = 'shoes',
-        component = { component = 6, drawable = 1, texture = 0 },
-        icon = '👟',
-        description = 'A pair of shoes.',
-    },
-    bracelet = {
-        label = 'Bracelet',
-        weight = 50,
-        stack = 1,
-        type = 'clothing',
-        slot = 'bracelet',
-        prop = { prop = 7, drawable = 0, texture = 0 },
-        icon = '📿',
-        description = 'A thin bracelet.',
-    },
-    jacket = {
-        label = 'Jacket',
-        weight = 500,
-        stack = 1,
-        type = 'clothing',
-        slot = 'jacket',
-        component = { component = 11, drawable = 2, texture = 0 },
-        icon = '🧥',
-        description = 'Keeps you warm.',
-    },
-    balaclava = {
-        label = 'Balaclava',
-        weight = 150,
-        stack = 1,
-        type = 'clothing',
-        slot = 'balaclava',
-        component = { component = 1, drawable = 2, texture = 0 },
-        icon = '🥷',
-        description = 'Conceals your identity.',
-    },
-    watch = {
-        label = 'Watch',
-        weight = 100,
-        stack = 1,
-        type = 'clothing',
-        slot = 'watch',
-        prop = { prop = 6, drawable = 0, texture = 0 },
-        icon = '⌚',
-        description = 'Tells the time, looks good doing it.',
-    },
-    vest = {
-        label = 'Vest',
-        weight = 1500,
-        stack = 1,
-        type = 'clothing',
-        slot = 'vest',
-        component = { component = 9, drawable = 1, texture = 0 },
-        icon = '🦺',
-        description = 'Offers some protection.',
-    },
-    glasses = {
-        label = 'Glasses',
-        weight = 80,
-        stack = 1,
-        type = 'clothing',
-        slot = 'glasses',
-        prop = { prop = 1, drawable = 0, texture = 0 },
-        icon = '🕶️',
-        description = 'Shields your eyes.',
-    },
-    backpack = {
-        label = 'Backpack',
-        weight = 600,
-        stack = 1,
-        type = 'clothing',
-        slot = 'backpack',
-        component = { component = 5, drawable = 1, texture = 0 },
-        icon = '🎒',
-        description = 'Extra storage on your back.',
-    },
-    rings = {
-        label = 'Rings',
-        weight = 30,
-        stack = 1,
-        type = 'clothing',
-        slot = 'rings',
-        icon = '💍',
-        description = 'A set of rings.',
-    },
-    badge = {
-        label = 'Badge',
-        weight = 50,
-        stack = 1,
-        type = 'clothing',
-        slot = 'badge',
-        icon = '🛡️',
-        description = 'Identifies you as on-duty.',
     },
 }

@@ -1,32 +1,5 @@
 OxInvState = { open = false, mode = nil, secondaryId = nil }
-OxEquipped = {} -- [clothingSlotName] = itemName, mirrors the server's clothing state for visual apply/clear
 Hotbar = {} -- [1..5] = inventory slot number, purely a client-side reference into the player's own inventory
-
-local function ApplyClothingItem(itemName)
-    local def = Items[itemName]
-    if not def then return end
-
-    local ped = PlayerPedId()
-
-    if def.component then
-        SetPedComponentVariation(ped, def.component.component, def.component.drawable, def.component.texture, 0)
-    elseif def.prop then
-        SetPedPropIndex(ped, def.prop.prop, def.prop.drawable, def.prop.texture, true)
-    end
-end
-
-local function ClearClothingItem(itemName)
-    local def = Items[itemName]
-    if not def then return end
-
-    local ped = PlayerPedId()
-
-    if def.component then
-        SetPedComponentVariation(ped, def.component.component, 0, 0, 0)
-    elseif def.prop then
-        ClearPedProp(ped, def.prop.prop)
-    end
-end
 
 local function FindSnapshotEntry(snapshot, slot)
     if not snapshot then return nil end
@@ -75,7 +48,7 @@ function OxInvOpen(mode, secondaryId)
 
     local secondarySnap, shopData
 
-    if (mode == 'stash' or mode == 'ground') and secondaryId then
+    if (mode == 'stash' or mode == 'ground' or mode == 'trunk') and secondaryId then
         local stashOk, snap = OxInvTriggerCallback('ox_inventory:getInventory', secondaryId)
         if not stashOk then return end
         secondarySnap = snap
@@ -98,7 +71,6 @@ function OxInvOpen(mode, secondaryId)
         secondary = secondarySnap,
         shop = shopData,
         hotbar = Hotbar,
-        clothingSlots = Config.ClothingSlots,
     })
 end
 
@@ -168,42 +140,6 @@ RegisterNUICallback('splitStack', function(data, cb)
     if not ok then
         cb({ ok = false, error = snapshot })
         return
-    end
-
-    SyncHotbar(snapshot)
-    cb({ ok = true, snapshot = snapshot })
-end)
-
-RegisterNUICallback('equipItem', function(data, cb)
-    local ok, snapshot = OxInvTriggerCallback('ox_inventory:equipItem', { slot = data.slot })
-
-    if not ok then
-        cb({ ok = false, error = snapshot })
-        return
-    end
-
-    local def = Items[data.itemName]
-    if def and def.slot then
-        OxEquipped[def.slot] = data.itemName
-        ApplyClothingItem(data.itemName)
-    end
-
-    SyncHotbar(snapshot)
-    cb({ ok = true, snapshot = snapshot })
-end)
-
-RegisterNUICallback('unequipItem', function(data, cb)
-    local wornItem = OxEquipped[data.slot]
-    local ok, snapshot = OxInvTriggerCallback('ox_inventory:unequipItem', { slot = data.slot })
-
-    if not ok then
-        cb({ ok = false, error = snapshot })
-        return
-    end
-
-    if wornItem then
-        ClearClothingItem(wornItem)
-        OxEquipped[data.slot] = nil
     end
 
     SyncHotbar(snapshot)
@@ -296,19 +232,6 @@ RegisterNetEvent('ox_inventory:client:notify', function(message)
     SendNUIMessage({ action = 'notify', message = message })
 end)
 
--- Re-applies whatever's already equipped (per the DB) onto the freshly
--- spawned ped - this is an additional handler on ox-core's existing event,
--- not a change to ox-core itself.
-RegisterNetEvent('ox:client:spawnPlayer', function()
-    local ok, snapshot = OxInvTriggerCallback('ox_inventory:getInventory', 'player')
-    if not ok then return end
-
-    for slotName, worn in pairs(snapshot.clothing or {}) do
-        OxEquipped[slotName] = worn.name
-        ApplyClothingItem(worn.name)
-    end
-end)
-
 -- Z is a pure modifier here, not bound to anything on its own - holding it
 -- and pressing 1-5 uses whatever's in that hotbar slot. The +/- command
 -- prefix is FiveM's documented way to track key-down/key-up state.
@@ -377,6 +300,47 @@ CreateThread(function()
 
                 if IsControlJustReleased(0, 38) then
                     OxInvOpen('stash', nearestId)
+                end
+            end
+        end
+    end
+end)
+
+-- There's no native GetClosestVehicle, so we walk the engine's pool of
+-- spawned vehicle entities ourselves and pick the nearest one in range.
+local function GetNearbyVehicle(coords, maxDist)
+    local nearest, nearestDist
+
+    for _, vehicle in ipairs(GetGamePool('CVehicle')) do
+        local dist = #(coords - GetEntityCoords(vehicle))
+        if dist <= maxDist and (not nearestDist or dist < nearestDist) then
+            nearest, nearestDist = vehicle, dist
+        end
+    end
+
+    return nearest
+end
+
+-- Trunk inventory: the label sent to the server is session-local
+-- ('trunk:<netId>') so the server can re-verify distance against the live
+-- entity, but it resolves internally to a persistent 'trunk:<plate>' storage
+-- key so contents survive the vehicle despawning and respawning.
+CreateThread(function()
+    while true do
+        Wait(500)
+
+        if not OxInvState.open then
+            local coords = GetEntityCoords(PlayerPedId())
+            local vehicle = GetNearbyVehicle(coords, Config.TrunkRange)
+
+            if vehicle then
+                BeginTextCommandDisplayHelp('STRING')
+                AddTextComponentSubstringPlayerName('[E] Open Trunk')
+                EndTextCommandDisplayHelp(0, false, true, -1)
+
+                if IsControlJustReleased(0, 38) then
+                    local netId = NetworkGetNetworkIdFromEntity(vehicle)
+                    OxInvOpen('trunk', 'trunk:' .. netId)
                 end
             end
         end

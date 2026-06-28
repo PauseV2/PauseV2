@@ -1,7 +1,5 @@
 const root = document.getElementById('root');
 
-const clothingGrid = document.getElementById('clothing-grid');
-
 const inventoryTitle = document.getElementById('inventory-title');
 const weightFill = document.getElementById('weight-fill');
 const weightText = document.getElementById('weight-text');
@@ -15,9 +13,9 @@ const giveBtn = document.getElementById('give-btn');
 const hotbarSection = document.getElementById('hotbar-section');
 const hotbarGrid = document.getElementById('hotbar-grid');
 
-const secondarySection = document.getElementById('secondary-section');
 const secondaryTitle = document.getElementById('secondary-title');
 const secondaryWeightText = document.getElementById('secondary-weight-text');
+const secondaryHint = document.getElementById('secondary-hint');
 const secondaryGrid = document.getElementById('secondary-grid');
 
 const shopSection = document.getElementById('shop-section');
@@ -29,12 +27,11 @@ const errorEl = document.getElementById('inv-error');
 const notifyEl = document.getElementById('inv-notify');
 
 const TABS = [
-    { id: 'all', icon: '🌐', label: 'All' },
-    { id: 'weapon', icon: '🔫', label: 'Weapons' },
-    { id: 'consumable', icon: '🍔', label: 'Consumables' },
-    { id: 'ammo', icon: '🔸', label: 'Ammo' },
-    { id: 'clothing', icon: '👕', label: 'Clothing' },
-    { id: 'misc', icon: '📦', label: 'Misc' },
+    { id: 'all', label: 'All' },
+    { id: 'weapon', label: 'Weapons' },
+    { id: 'consumable', label: 'Consumables' },
+    { id: 'ammo', label: 'Ammo' },
+    { id: 'misc', label: 'Misc' },
 ];
 
 let mode = null;
@@ -42,7 +39,6 @@ let secondaryId = null;
 let playerSnapshot = null;
 let secondarySnapshot = null;
 let shopData = null;
-let clothingSlots = [];
 let hotbar = {};
 let selected = null; // { inv: 'player'|secondaryId, slot }
 let activeTab = 'all';
@@ -84,16 +80,6 @@ function findEntry(snapshot, slot) {
     return snapshot && snapshot.items.find((entry) => entry.slot === slot);
 }
 
-function getSnapshotFor(invId) {
-    if (invId === 'player') return playerSnapshot;
-    if (invId === secondaryId) return secondarySnapshot;
-    return null;
-}
-
-function getEntryFor(invId, slot) {
-    return findEntry(getSnapshotFor(invId), slot);
-}
-
 function fmtKg(grams, decimals) {
     return (grams / 1000).toFixed(decimals === undefined ? 1 : decimals);
 }
@@ -102,7 +88,6 @@ function categoryOf(entry) {
     if (entry.type === 'weapon') return 'weapon';
     if (entry.type === 'food' || entry.type === 'drink' || entry.type === 'medical') return 'consumable';
     if (entry.type === 'ammo') return 'ammo';
-    if (entry.type === 'clothing') return 'clothing';
     return 'misc';
 }
 
@@ -148,7 +133,6 @@ function renderSlotGrid(container, snapshot, invId, filterTab) {
             slotEl.draggable = true;
             slotEl.innerHTML = `
                 <div class="slot-count">x${entry.count}</div>
-                <div class="slot-icon">${entry.icon}</div>
                 <div class="slot-label">${entry.label}</div>
             `;
 
@@ -182,8 +166,7 @@ function renderTabs() {
     TABS.forEach((tab) => {
         const btn = document.createElement('button');
         btn.className = 'tab-btn' + (activeTab === tab.id ? ' active' : '');
-        btn.textContent = tab.icon;
-        btn.title = tab.label;
+        btn.textContent = tab.label;
         btn.addEventListener('click', () => {
             activeTab = tab.id;
             renderAll();
@@ -201,56 +184,21 @@ function renderHeader() {
     inventoryTitle.textContent = mode === 'shop' ? 'Shop' : 'Inventory';
 }
 
-function setupClothingDropTarget(el, slotName) {
-    el.addEventListener('dragover', (event) => {
-        event.preventDefault();
-        el.classList.add('drag-over');
-    });
+function renderSecondaryPanel() {
+    const hasSecondary = (mode === 'stash' || mode === 'ground' || mode === 'trunk') && secondarySnapshot;
 
-    el.addEventListener('dragleave', () => {
-        el.classList.remove('drag-over');
-    });
+    secondaryHint.classList.toggle('hidden', !!hasSecondary);
+    secondaryGrid.classList.toggle('hidden', !hasSecondary);
 
-    el.addEventListener('drop', (event) => {
-        event.preventDefault();
-        el.classList.remove('drag-over');
-
-        const raw = event.dataTransfer.getData('text/plain');
-        if (!raw) return;
-
-        const from = JSON.parse(raw);
-        if (from.inv !== 'player') return;
-
-        const entry = getEntryFor('player', from.slot);
-        if (!entry || entry.type !== 'clothing') return;
-
-        if (entry.wearSlot !== slotName) {
-            showError('That item does not go in this slot.');
-            return;
-        }
-
-        equipItem(from.slot, entry.name);
-    });
-}
-
-function renderClothingGrid() {
-    clothingGrid.innerHTML = '';
-
-    clothingSlots.forEach((slotName) => {
-        const worn = playerSnapshot && playerSnapshot.clothing && playerSnapshot.clothing[slotName];
-        const el = document.createElement('div');
-        el.className = 'clothing-slot' + (worn ? ' has-item' : '');
-        el.innerHTML = worn
-            ? `<div class="slot-icon">${worn.icon}</div><div class="slot-label">${slotName.toUpperCase()}</div>`
-            : `<div class="slot-label">${slotName.toUpperCase()}</div>`;
-
-        el.addEventListener('click', () => {
-            if (worn) unequipItem(slotName);
-        });
-
-        setupClothingDropTarget(el, slotName);
-        clothingGrid.appendChild(el);
-    });
+    if (hasSecondary) {
+        secondaryTitle.textContent = secondarySnapshot.label;
+        secondaryWeightText.textContent = `${fmtKg(secondarySnapshot.weight, 0)}/${fmtKg(secondarySnapshot.maxWeight, 0)}kg`;
+        renderSlotGrid(secondaryGrid, secondarySnapshot, secondaryId, null);
+    } else {
+        secondaryTitle.textContent = 'Storage';
+        secondaryWeightText.textContent = '';
+        secondaryGrid.innerHTML = '';
+    }
 }
 
 function renderHotbarGrid() {
@@ -261,7 +209,7 @@ function renderHotbarGrid() {
         const entry = slotNum ? findEntry(playerSnapshot, slotNum) : null;
         const el = document.createElement('div');
         el.className = 'hotbar-slot';
-        el.innerHTML = `<div class="hotbar-index">${i}</div>` + (entry ? `<div class="slot-icon">${entry.icon}</div>` : '');
+        el.innerHTML = `<div class="hotbar-index">${i}</div>` + (entry ? `<div class="slot-label">${entry.label}</div>` : '');
 
         el.addEventListener('dragover', (event) => {
             event.preventDefault();
@@ -336,16 +284,9 @@ function renderShop() {
 
 function renderBottomPanel() {
     hotbarSection.classList.toggle('hidden', mode !== 'inventory');
-    secondarySection.classList.toggle('hidden', mode !== 'stash' && mode !== 'ground');
     shopSection.classList.toggle('hidden', mode !== 'shop');
 
-    if (mode === 'stash' || mode === 'ground') {
-        secondaryTitle.textContent = secondarySnapshot ? secondarySnapshot.label : '';
-        secondaryWeightText.textContent = secondarySnapshot
-            ? `${fmtKg(secondarySnapshot.weight, 0)}/${fmtKg(secondarySnapshot.maxWeight, 0)}kg`
-            : '';
-        renderSlotGrid(secondaryGrid, secondarySnapshot, secondaryId, null);
-    } else if (mode === 'shop') {
+    if (mode === 'shop') {
         renderShop();
     } else {
         renderHotbarGrid();
@@ -366,7 +307,7 @@ function renderActionRow() {
 }
 
 function renderAll() {
-    renderClothingGrid();
+    renderSecondaryPanel();
     renderTabs();
     renderHeader();
     renderMainGrid();
@@ -450,33 +391,6 @@ async function buyItem(item, count, account) {
     renderAll();
 }
 
-async function equipItem(slot, itemName) {
-    clearError();
-    const result = await nuiCallback('equipItem', { slot, itemName });
-
-    if (!result.ok) {
-        showError(result.error || 'Failed to equip item.');
-        return;
-    }
-
-    playerSnapshot = result.snapshot;
-    selected = null;
-    renderAll();
-}
-
-async function unequipItem(slotName) {
-    clearError();
-    const result = await nuiCallback('unequipItem', { slot: slotName });
-
-    if (!result.ok) {
-        showError(result.error || 'Failed to unequip item.');
-        return;
-    }
-
-    playerSnapshot = result.snapshot;
-    renderAll();
-}
-
 async function assignHotbar(index, slot) {
     await nuiCallback('setHotbar', { index, slot });
     hotbar[index] = slot;
@@ -508,7 +422,6 @@ window.addEventListener('message', (event) => {
         playerSnapshot = data.player;
         secondarySnapshot = data.secondary;
         shopData = data.shop;
-        clothingSlots = data.clothingSlots || [];
         hotbar = data.hotbar || {};
         selected = null;
         activeTab = 'all';

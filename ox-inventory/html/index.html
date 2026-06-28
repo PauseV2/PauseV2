@@ -8,18 +8,17 @@
 <body>
     <div id="root" class="hidden">
         <div id="app">
-            <div id="clothing-panel" class="panel">
+            <div id="secondary-panel" class="panel">
                 <div class="panel-header">
-                    <span class="panel-icon">👤</span>
-                    <h1>Clothing</h1>
+                    <h1 id="secondary-title">Storage</h1>
+                    <span id="secondary-weight-text" class="panel-hint-right"></span>
                 </div>
-                <p class="panel-hint">Tap an item to equip or remove it</p>
-                <div id="clothing-grid" class="clothing-grid"></div>
+                <p id="secondary-hint" class="panel-hint">Nothing here yet</p>
+                <div id="secondary-grid" class="slot-grid"></div>
             </div>
 
             <div id="inventory-panel" class="panel">
                 <div class="panel-header">
-                    <span class="panel-icon">🔒</span>
                     <h1 id="inventory-title">Inventory</h1>
                     <div class="weight-bar-wrap">
                         <div class="weight-bar"><div id="weight-fill" class="weight-fill"></div></div>
@@ -43,19 +42,10 @@
                 <div id="bottom-panel">
                     <div id="hotbar-section" class="bottom-section">
                         <div class="panel-header">
-                            <span class="panel-icon">➖</span>
                             <h1>Hotbar</h1>
                             <span class="panel-hint-right">Press Z to use</span>
                         </div>
                         <div id="hotbar-grid" class="hotbar-grid"></div>
-                    </div>
-
-                    <div id="secondary-section" class="bottom-section hidden">
-                        <div class="panel-header">
-                            <h1 id="secondary-title"></h1>
-                            <span id="secondary-weight-text" class="panel-hint-right"></span>
-                        </div>
-                        <div id="secondary-grid" class="slot-grid"></div>
                     </div>
 
                     <div id="shop-section" class="bottom-section hidden">

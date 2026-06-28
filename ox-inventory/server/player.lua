@@ -36,6 +36,28 @@ local function ResolveInvId(source, label)
         return label
     end
 
+    -- The label is session-local ('trunk:<netId>') so we can re-verify the
+    -- player is actually next to that live vehicle entity, but the storage
+    -- key it resolves to is the vehicle's plate, since netIds don't survive
+    -- the vehicle despawning/respawning and plates do.
+    if label:sub(1, 6) == 'trunk:' then
+        local netId = tonumber(label:sub(7))
+        if not netId then return nil end
+
+        local vehicle = NetworkGetEntityFromNetworkId(netId)
+        if vehicle == 0 or not DoesEntityExist(vehicle) then return nil end
+
+        if DistanceTo(source, GetEntityCoords(vehicle)) > Config.TrunkRange then
+            return nil
+        end
+
+        local plate = GetVehicleNumberPlateText(vehicle):gsub('%s+$', '')
+        local trunkId = 'trunk:' .. plate
+
+        OxInv.Load(trunkId, 'trunk', 'Trunk', Config.TrunkMaxWeight, Config.TrunkSlots)
+        return trunkId
+    end
+
     local stash = Config.Stashes[label]
     if not stash then return nil end
 
@@ -218,26 +240,6 @@ OxInvCallbacks.Register('ox_inventory:splitStack', function(source, data)
     if not emptySlot then return false, 'no empty slot to split into' end
 
     local ok, err = OxInv.MoveItem(citizenid, data.slot, citizenid, emptySlot, count)
-    if not ok then return false, err end
-
-    return true, OxInv.Snapshot(citizenid)
-end)
-
-OxInvCallbacks.Register('ox_inventory:equipItem', function(source, data)
-    local citizenid = OxInv.GetCitizenId(source)
-    if not citizenid then return false, 'character not loaded' end
-
-    local ok, err = OxInv.EquipItem(citizenid, data.slot)
-    if not ok then return false, err end
-
-    return true, OxInv.Snapshot(citizenid)
-end)
-
-OxInvCallbacks.Register('ox_inventory:unequipItem', function(source, data)
-    local citizenid = OxInv.GetCitizenId(source)
-    if not citizenid then return false, 'character not loaded' end
-
-    local ok, err = OxInv.UnequipItem(citizenid, data.slot)
     if not ok then return false, err end
 
     return true, OxInv.Snapshot(citizenid)
