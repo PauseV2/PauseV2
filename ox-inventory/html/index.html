@@ -7,85 +7,73 @@
 </head>
 <body>
     <div id="root" class="hidden">
-        <div id="inventory">
-            <div class="inv-header">
-                <div class="header-left">
-                    <span class="bag-icon">🎒</span>
-                    <div class="header-title">
-                        <h1>INVENTORY</h1>
-                        <div class="weight-line"><span class="lock-icon">🔒</span><span id="header-weight-left"></span></div>
+        <div id="app">
+            <div id="clothing-panel" class="panel">
+                <div class="panel-header">
+                    <span class="panel-icon">👤</span>
+                    <h1>Clothing</h1>
+                </div>
+                <p class="panel-hint">Tap an item to equip or remove it</p>
+                <div id="clothing-grid" class="clothing-grid"></div>
+            </div>
+
+            <div id="inventory-panel" class="panel">
+                <div class="panel-header">
+                    <span class="panel-icon">🔒</span>
+                    <h1 id="inventory-title">Inventory</h1>
+                    <div class="weight-bar-wrap">
+                        <div class="weight-bar"><div id="weight-fill" class="weight-fill"></div></div>
                     </div>
-                </div>
-
-                <div class="search-wrap">
-                    <input id="search-input" type="text" placeholder="Search item..." />
-                </div>
-
-                <div class="header-right">
-                    <span class="weight-line"><span class="lock-icon">🔒</span><span id="header-weight-right"></span></span>
+                    <span id="weight-text" class="weight-text"></span>
                     <button id="close-btn" class="icon-btn">✕</button>
                 </div>
-            </div>
 
-            <div class="inv-body">
-                <div id="player-grid" class="grid"></div>
-                <div id="player-list" class="list hidden"></div>
+                <div id="tabs" class="tabs"></div>
 
-                <div id="context-pane" class="panel">
-                    <div id="detail-view">
-                        <div class="panel-lock">🔒</div>
-                        <div id="detail-icon" class="detail-icon"></div>
-                        <h2 id="detail-name"></h2>
-                        <div class="weight-line"><span class="lock-icon">🔒</span><span id="detail-weight"></span></div>
-                        <p id="detail-description"></p>
-                        <div class="qty-stepper">
-                            <button id="qty-minus">–</button>
-                            <input id="qty-input" type="number" min="1" value="1" />
-                            <button id="qty-plus">+</button>
+                <div id="main-grid" class="slot-grid"></div>
+
+                <div class="action-row">
+                    <input id="amount-input" type="number" min="1" value="1" />
+                    <div class="action-buttons">
+                        <button id="use-btn" class="action-btn" disabled>USE</button>
+                        <button id="give-btn" class="action-btn" disabled>GIVE</button>
+                    </div>
+                </div>
+
+                <div id="bottom-panel">
+                    <div id="hotbar-section" class="bottom-section">
+                        <div class="panel-header">
+                            <span class="panel-icon">➖</span>
+                            <h1>Hotbar</h1>
+                            <span class="panel-hint-right">Press Z to use</span>
                         </div>
-                        <button id="use-item-btn" class="primary-btn">Use item</button>
+                        <div id="hotbar-grid" class="hotbar-grid"></div>
                     </div>
 
-                    <div id="secondary-view" class="hidden">
-                        <h2 id="context-title"></h2>
-                        <div id="context-weight-wrap" class="weight-wrap">
-                            <div class="weight-bar"><div id="context-weight-fill" class="weight-fill"></div></div>
-                            <span id="context-weight-text"></span>
+                    <div id="secondary-section" class="bottom-section hidden">
+                        <div class="panel-header">
+                            <h1 id="secondary-title"></h1>
+                            <span id="secondary-weight-text" class="panel-hint-right"></span>
                         </div>
-                        <div id="context-grid" class="grid"></div>
+                        <div id="secondary-grid" class="slot-grid"></div>
                     </div>
 
-                    <div id="shop-view" class="hidden">
-                        <h2 id="shop-title"></h2>
+                    <div id="shop-section" class="bottom-section hidden">
+                        <div class="panel-header">
+                            <h1 id="shop-title"></h1>
+                            <select id="shop-account-select">
+                                <option value="cash">Cash</option>
+                                <option value="bank">Bank</option>
+                            </select>
+                        </div>
                         <div id="shop-list"></div>
                     </div>
-
-                    <div id="empty-view" class="hidden">
-                        <p class="empty-hint">Select an item to view details.</p>
-                    </div>
                 </div>
             </div>
-
-            <div class="inv-footer">
-                <div class="footer-group">
-                    <button id="use-btn" class="footer-btn" disabled>🤚 Use</button>
-                    <button id="drop-btn" class="footer-btn" disabled>🗑 Drop</button>
-                </div>
-
-                <div class="footer-group view-toggle">
-                    <button id="view-grid-btn" class="view-btn active">▦</button>
-                    <button id="view-list-btn" class="view-btn">☰</button>
-                </div>
-
-                <div class="footer-group">
-                    <button id="split-btn" class="footer-btn" disabled>⇄ Split</button>
-                    <button id="give-btn" class="footer-btn" disabled>👤 Give</button>
-                </div>
-            </div>
-
-            <p id="inv-error" class="toast error hidden"></p>
-            <p id="inv-notify" class="toast notify hidden"></p>
         </div>
+
+        <p id="inv-error" class="toast error hidden"></p>
+        <p id="inv-notify" class="toast notify hidden"></p>
     </div>
 
     <script src="app.js"></script>

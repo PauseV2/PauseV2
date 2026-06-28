@@ -222,3 +222,23 @@ OxInvCallbacks.Register('ox_inventory:splitStack', function(source, data)
 
     return true, OxInv.Snapshot(citizenid)
 end)
+
+OxInvCallbacks.Register('ox_inventory:equipItem', function(source, data)
+    local citizenid = OxInv.GetCitizenId(source)
+    if not citizenid then return false, 'character not loaded' end
+
+    local ok, err = OxInv.EquipItem(citizenid, data.slot)
+    if not ok then return false, err end
+
+    return true, OxInv.Snapshot(citizenid)
+end)
+
+OxInvCallbacks.Register('ox_inventory:unequipItem', function(source, data)
+    local citizenid = OxInv.GetCitizenId(source)
+    if not citizenid then return false, 'character not loaded' end
+
+    local ok, err = OxInv.UnequipItem(citizenid, data.slot)
+    if not ok then return false, err end
+
+    return true, OxInv.Snapshot(citizenid)
+end)

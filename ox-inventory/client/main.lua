@@ -1,4 +1,73 @@
 OxInvState = { open = false, mode = nil, secondaryId = nil }
+OxEquipped = {} -- [clothingSlotName] = itemName, mirrors the server's clothing state for visual apply/clear
+Hotbar = {} -- [1..5] = inventory slot number, purely a client-side reference into the player's own inventory
+
+local function ApplyClothingItem(itemName)
+    local def = Items[itemName]
+    if not def then return end
+
+    local ped = PlayerPedId()
+
+    if def.component then
+        SetPedComponentVariation(ped, def.component.component, def.component.drawable, def.component.texture, 0)
+    elseif def.prop then
+        SetPedPropIndex(ped, def.prop.prop, def.prop.drawable, def.prop.texture, true)
+    end
+end
+
+local function ClearClothingItem(itemName)
+    local def = Items[itemName]
+    if not def then return end
+
+    local ped = PlayerPedId()
+
+    if def.component then
+        SetPedComponentVariation(ped, def.component.component, 0, 0, 0)
+    elseif def.prop then
+        ClearPedProp(ped, def.prop.prop)
+    end
+end
+
+local function FindSnapshotEntry(snapshot, slot)
+    if not snapshot then return nil end
+
+    for _, entry in ipairs(snapshot.items) do
+        if entry.slot == slot then return entry end
+    end
+
+    return nil
+end
+
+-- Hotbar slots only ever hold a slot *number*, not an item identity, so once
+-- whatever used to be in that slot is gone (used up, dropped, given away,
+-- moved out), the assignment is stale and needs to drop automatically.
+local function SyncHotbar(snapshot)
+    if not snapshot then return end
+
+    local changed = false
+
+    for i = 1, 5 do
+        local slot = Hotbar[i]
+        if slot and not FindSnapshotEntry(snapshot, slot) then
+            Hotbar[i] = nil
+            changed = true
+        end
+    end
+
+    if changed then
+        SendNUIMessage({ action = 'hotbar', hotbar = Hotbar })
+    end
+end
+
+function OxInvUseHotbarSlot(index)
+    local slot = Hotbar[index]
+    if not slot then return end
+
+    local ok, snapshot = OxInvTriggerCallback('ox_inventory:useItem', slot)
+    if not ok then return end
+
+    SyncHotbar(snapshot)
+end
 
 function OxInvOpen(mode, secondaryId)
     local ok, playerSnap = OxInvTriggerCallback('ox_inventory:getInventory', 'player')
@@ -28,6 +97,8 @@ function OxInvOpen(mode, secondaryId)
         player = playerSnap,
         secondary = secondarySnap,
         shop = shopData,
+        hotbar = Hotbar,
+        clothingSlots = Config.ClothingSlots,
     })
 end
 
@@ -63,6 +134,7 @@ RegisterNUICallback('moveItem', function(data, cb)
         return
     end
 
+    SyncHotbar(data.toInv == 'player' and toSnapshot or fromSnapshot)
     cb({ ok = true, fromSnapshot = fromSnapshot, toSnapshot = toSnapshot })
 end)
 
@@ -74,6 +146,7 @@ RegisterNUICallback('useItem', function(data, cb)
         return
     end
 
+    SyncHotbar(snapshot)
     cb({ ok = true, snapshot = snapshot })
 end)
 
@@ -85,6 +158,7 @@ RegisterNUICallback('buyItem', function(data, cb)
         return
     end
 
+    SyncHotbar(snapshot)
     cb({ ok = true, snapshot = snapshot })
 end)
 
@@ -96,7 +170,54 @@ RegisterNUICallback('splitStack', function(data, cb)
         return
     end
 
+    SyncHotbar(snapshot)
     cb({ ok = true, snapshot = snapshot })
+end)
+
+RegisterNUICallback('equipItem', function(data, cb)
+    local ok, snapshot = OxInvTriggerCallback('ox_inventory:equipItem', { slot = data.slot })
+
+    if not ok then
+        cb({ ok = false, error = snapshot })
+        return
+    end
+
+    local def = Items[data.itemName]
+    if def and def.slot then
+        OxEquipped[def.slot] = data.itemName
+        ApplyClothingItem(data.itemName)
+    end
+
+    SyncHotbar(snapshot)
+    cb({ ok = true, snapshot = snapshot })
+end)
+
+RegisterNUICallback('unequipItem', function(data, cb)
+    local wornItem = OxEquipped[data.slot]
+    local ok, snapshot = OxInvTriggerCallback('ox_inventory:unequipItem', { slot = data.slot })
+
+    if not ok then
+        cb({ ok = false, error = snapshot })
+        return
+    end
+
+    if wornItem then
+        ClearClothingItem(wornItem)
+        OxEquipped[data.slot] = nil
+    end
+
+    SyncHotbar(snapshot)
+    cb({ ok = true, snapshot = snapshot })
+end)
+
+RegisterNUICallback('setHotbar', function(data, cb)
+    Hotbar[data.index] = data.slot
+    cb({ ok = true })
+end)
+
+RegisterNUICallback('clearHotbar', function(data, cb)
+    Hotbar[data.index] = nil
+    cb({ ok = true })
 end)
 
 RegisterNUICallback('dropItem', function(data, cb)
@@ -127,6 +248,7 @@ RegisterNUICallback('dropItem', function(data, cb)
         return
     end
 
+    SyncHotbar(snapshot)
     cb({ ok = true, snapshot = snapshot })
 end)
 
@@ -159,6 +281,7 @@ RegisterNUICallback('giveItem', function(data, cb)
         return
     end
 
+    SyncHotbar(snapshot)
     cb({ ok = true, snapshot = snapshot })
 end)
 
@@ -172,6 +295,38 @@ end)
 RegisterNetEvent('ox_inventory:client:notify', function(message)
     SendNUIMessage({ action = 'notify', message = message })
 end)
+
+-- Re-applies whatever's already equipped (per the DB) onto the freshly
+-- spawned ped - this is an additional handler on ox-core's existing event,
+-- not a change to ox-core itself.
+RegisterNetEvent('ox:client:spawnPlayer', function()
+    local ok, snapshot = OxInvTriggerCallback('ox_inventory:getInventory', 'player')
+    if not ok then return end
+
+    for slotName, worn in pairs(snapshot.clothing or {}) do
+        OxEquipped[slotName] = worn.name
+        ApplyClothingItem(worn.name)
+    end
+end)
+
+-- Z is a pure modifier here, not bound to anything on its own - holding it
+-- and pressing 1-5 uses whatever's in that hotbar slot. The +/- command
+-- prefix is FiveM's documented way to track key-down/key-up state.
+local zHeld = false
+
+RegisterCommand('+oxinv:hotbarmod', function() zHeld = true end, false)
+RegisterCommand('-oxinv:hotbarmod', function() zHeld = false end, false)
+RegisterKeyMapping('+oxinv:hotbarmod', 'Hotbar Use Modifier', 'keyboard', 'Z')
+
+for i = 1, 5 do
+    RegisterCommand('oxinv:hotbar' .. i, function()
+        if zHeld and not OxInvState.open then
+            OxInvUseHotbarSlot(i)
+        end
+    end, false)
+
+    RegisterKeyMapping('oxinv:hotbar' .. i, 'Use Hotbar Slot ' .. i, 'keyboard', tostring(i))
+end
 
 -- Ground bags: any player's dropped prop is visible to everyone since
 -- CreateObject(..., true, ...) is networked by the engine automatically.

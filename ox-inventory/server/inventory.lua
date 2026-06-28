@@ -3,7 +3,7 @@
 -- backrooms etc.) are all the same data structure underneath.
 
 OxInv = {
-    cache = {}, -- [id] = { id, type, label, maxWeight, slots, items = { [slot] = {slot,name,count,metadata} } }
+    cache = {}, -- [id] = { id, type, label, maxWeight, slots, items = { [slot] = {slot,name,count,metadata} }, clothing = { [slotName] = {name,metadata} } }
 }
 
 local function FindItemDef(name)
@@ -34,15 +34,21 @@ function OxInv.Load(id, invType, label, maxWeight, slots)
     if OxInv.cache[id] then return OxInv.cache[id] end
 
     local row = OxInvDB.Load(id)
-    local items = {}
+    local items, clothing = {}, {}
 
     if row and row.data then
         local decoded = json.decode(row.data)
 
         if decoded then
-            for _, entry in ipairs(decoded) do
+            -- decoded.items is the current shape; a bare array is the
+            -- pre-clothing format saved before this field existed.
+            local rawItems = decoded.items or decoded
+
+            for _, entry in ipairs(rawItems) do
                 items[entry.slot] = entry
             end
+
+            clothing = decoded.clothing or {}
         end
     end
 
@@ -53,6 +59,7 @@ function OxInv.Load(id, invType, label, maxWeight, slots)
         maxWeight = maxWeight or Config.MaxWeight,
         slots = slots or Config.MaxSlots,
         items = items,
+        clothing = clothing,
     }
 
     OxInv.cache[id] = inv
@@ -72,7 +79,7 @@ function OxInv.Save(inv)
         list[#list + 1] = entry
     end
 
-    OxInvDB.Save(inv.id, inv.type, list)
+    OxInvDB.Save(inv.id, inv.type, { items = list, clothing = inv.clothing })
 end
 
 -- Ground items: created on drop, never DB-backed, destroyed once emptied.
@@ -84,6 +91,7 @@ function OxInv.CreateEphemeral(id, label, maxWeight, slots, coords)
         maxWeight = maxWeight,
         slots = slots,
         items = {},
+        clothing = {},
         coords = coords,
         ephemeral = true,
     }
@@ -112,6 +120,51 @@ function OxInv.FindEmptySlot(inv)
     end
 
     return nil
+end
+
+-- Moves a clothing-type item out of its normal weighted slot into the fixed
+-- clothing slot named on the item def. Equipped items don't count toward
+-- weight - they're worn, not carried.
+function OxInv.EquipItem(id, slot)
+    local inv = OxInv.cache[id]
+    if not inv then return false, 'inventory not loaded' end
+
+    local entry = inv.items[slot]
+    if not entry then return false, 'empty slot' end
+
+    local def = FindItemDef(entry.name)
+    if not def or def.type ~= 'clothing' or not def.slot then
+        return false, 'item is not wearable'
+    end
+
+    if inv.clothing[def.slot] then
+        return false, 'unequip that slot first'
+    end
+
+    inv.clothing[def.slot] = { name = entry.name, metadata = entry.metadata }
+
+    entry.count = entry.count - 1
+    if entry.count <= 0 then
+        inv.items[slot] = nil
+    end
+
+    return true
+end
+
+-- Reverses EquipItem: the worn item re-enters the normal weighted inventory,
+-- so it can fail if there's no space or weight capacity left.
+function OxInv.UnequipItem(id, clothingSlot)
+    local inv = OxInv.cache[id]
+    if not inv then return false, 'inventory not loaded' end
+
+    local worn = inv.clothing[clothingSlot]
+    if not worn then return false, 'slot is empty' end
+
+    local added = OxInv.AddItem(id, worn.name, 1, worn.metadata)
+    if not added then return false, 'no space in inventory' end
+
+    inv.clothing[clothingSlot] = nil
+    return true
 end
 
 function OxInv.Close(id)
@@ -239,6 +292,22 @@ function OxInv.Snapshot(id)
             weight = def and def.weight or 0,
             icon = def and def.icon or '❓',
             description = def and def.description or '',
+            type = def and def.type or 'item',
+            wearSlot = def and def.slot or nil,
+        }
+    end
+
+    local clothing = {}
+
+    for slotName, worn in pairs(inv.clothing or {}) do
+        local def = FindItemDef(worn.name)
+
+        clothing[slotName] = {
+            name = worn.name,
+            metadata = worn.metadata,
+            label = def and def.label or worn.name,
+            icon = def and def.icon or '❓',
+            description = def and def.description or '',
         }
     end
 
@@ -249,6 +318,7 @@ function OxInv.Snapshot(id)
         maxWeight = inv.maxWeight,
         weight = OxInv.GetWeight(inv),
         items = items,
+        clothing = clothing,
     }
 end
 

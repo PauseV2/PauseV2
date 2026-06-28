@@ -1,54 +1,51 @@
 const root = document.getElementById('root');
 
-const headerWeightLeft = document.getElementById('header-weight-left');
-const headerWeightRight = document.getElementById('header-weight-right');
-const searchInput = document.getElementById('search-input');
+const clothingGrid = document.getElementById('clothing-grid');
+
+const inventoryTitle = document.getElementById('inventory-title');
+const weightFill = document.getElementById('weight-fill');
+const weightText = document.getElementById('weight-text');
 const closeBtn = document.getElementById('close-btn');
-
-const playerGrid = document.getElementById('player-grid');
-const playerList = document.getElementById('player-list');
-
-const contextPane = document.getElementById('context-pane');
-const detailView = document.getElementById('detail-view');
-const detailIcon = document.getElementById('detail-icon');
-const detailName = document.getElementById('detail-name');
-const detailWeight = document.getElementById('detail-weight');
-const detailDescription = document.getElementById('detail-description');
-const qtyMinus = document.getElementById('qty-minus');
-const qtyInput = document.getElementById('qty-input');
-const qtyPlus = document.getElementById('qty-plus');
-const useItemBtn = document.getElementById('use-item-btn');
-
-const secondaryView = document.getElementById('secondary-view');
-const contextTitle = document.getElementById('context-title');
-const contextWeightFill = document.getElementById('context-weight-fill');
-const contextWeightText = document.getElementById('context-weight-text');
-const contextGrid = document.getElementById('context-grid');
-
-const shopView = document.getElementById('shop-view');
-const shopTitle = document.getElementById('shop-title');
-const shopList = document.getElementById('shop-list');
-
-const emptyView = document.getElementById('empty-view');
-
+const tabsEl = document.getElementById('tabs');
+const mainGrid = document.getElementById('main-grid');
+const amountInput = document.getElementById('amount-input');
 const useBtn = document.getElementById('use-btn');
-const dropBtn = document.getElementById('drop-btn');
-const splitBtn = document.getElementById('split-btn');
 const giveBtn = document.getElementById('give-btn');
-const viewGridBtn = document.getElementById('view-grid-btn');
-const viewListBtn = document.getElementById('view-list-btn');
+
+const hotbarSection = document.getElementById('hotbar-section');
+const hotbarGrid = document.getElementById('hotbar-grid');
+
+const secondarySection = document.getElementById('secondary-section');
+const secondaryTitle = document.getElementById('secondary-title');
+const secondaryWeightText = document.getElementById('secondary-weight-text');
+const secondaryGrid = document.getElementById('secondary-grid');
+
+const shopSection = document.getElementById('shop-section');
+const shopTitle = document.getElementById('shop-title');
+const shopAccountSelect = document.getElementById('shop-account-select');
+const shopList = document.getElementById('shop-list');
 
 const errorEl = document.getElementById('inv-error');
 const notifyEl = document.getElementById('inv-notify');
+
+const TABS = [
+    { id: 'all', icon: '🌐', label: 'All' },
+    { id: 'weapon', icon: '🔫', label: 'Weapons' },
+    { id: 'consumable', icon: '🍔', label: 'Consumables' },
+    { id: 'ammo', icon: '🔸', label: 'Ammo' },
+    { id: 'clothing', icon: '👕', label: 'Clothing' },
+    { id: 'misc', icon: '📦', label: 'Misc' },
+];
 
 let mode = null;
 let secondaryId = null;
 let playerSnapshot = null;
 let secondarySnapshot = null;
 let shopData = null;
+let clothingSlots = [];
+let hotbar = {};
 let selected = null; // { inv: 'player'|secondaryId, slot }
-let viewMode = 'grid'; // 'grid' | 'list'
-let searchTerm = '';
+let activeTab = 'all';
 
 function resourceName() {
     return window.GetParentResourceName ? window.GetParentResourceName() : 'ox-inventory';
@@ -101,12 +98,15 @@ function fmtKg(grams, decimals) {
     return (grams / 1000).toFixed(decimals === undefined ? 1 : decimals);
 }
 
-function matchesSearch(entry) {
-    if (!searchTerm) return true;
-    return entry.label.toLowerCase().includes(searchTerm);
+function categoryOf(entry) {
+    if (entry.type === 'weapon') return 'weapon';
+    if (entry.type === 'food' || entry.type === 'drink' || entry.type === 'medical') return 'consumable';
+    if (entry.type === 'ammo') return 'ammo';
+    if (entry.type === 'clothing') return 'clothing';
+    return 'misc';
 }
 
-function setupDragTarget(el, invId, slot) {
+function setupGridDropTarget(el, invId, slot) {
     el.addEventListener('dragover', (event) => {
         event.preventDefault();
         el.classList.add('drag-over');
@@ -130,7 +130,7 @@ function setupDragTarget(el, invId, slot) {
     });
 }
 
-function renderGrid(container, snapshot, invId) {
+function renderSlotGrid(container, snapshot, invId, filterTab) {
     container.innerHTML = '';
     if (!snapshot) return;
 
@@ -140,7 +140,7 @@ function renderGrid(container, snapshot, invId) {
         slotEl.className = 'slot';
 
         if (entry) {
-            if (invId === 'player' && !matchesSearch(entry)) {
+            if (filterTab && filterTab !== 'all' && categoryOf(entry) !== filterTab) {
                 slotEl.style.display = 'none';
             }
 
@@ -150,14 +150,16 @@ function renderGrid(container, snapshot, invId) {
                 <div class="slot-count">x${entry.count}</div>
                 <div class="slot-icon">${entry.icon}</div>
                 <div class="slot-label">${entry.label}</div>
-                <div class="slot-weight">${fmtKg(entry.weight * entry.count)} KG</div>
             `;
 
             slotEl.addEventListener('dragstart', (event) => {
                 event.dataTransfer.setData('text/plain', JSON.stringify({ inv: invId, slot }));
             });
-        } else {
-            slotEl.classList.add('empty');
+
+            slotEl.addEventListener('contextmenu', (event) => {
+                event.preventDefault();
+                if (invId === 'player') assignToFirstHotbarSlot(slot);
+            });
         }
 
         if (selected && selected.inv === invId && selected.slot === slot) {
@@ -165,69 +167,142 @@ function renderGrid(container, snapshot, invId) {
         }
 
         slotEl.addEventListener('click', () => onSlotClick(invId, slot, !!entry));
-        setupDragTarget(slotEl, invId, slot);
+        setupGridDropTarget(slotEl, invId, slot);
         container.appendChild(slotEl);
     }
 }
 
-function renderList(container, snapshot, invId) {
-    container.innerHTML = '';
-    if (!snapshot) return;
+function renderMainGrid() {
+    renderSlotGrid(mainGrid, playerSnapshot, 'player', activeTab);
+}
 
-    for (let slot = 1; slot <= snapshot.slots; slot++) {
-        const entry = findEntry(snapshot, slot);
-        if (!entry) continue;
-        if (invId === 'player' && !matchesSearch(entry)) continue;
+function renderTabs() {
+    tabsEl.innerHTML = '';
 
-        const rowEl = document.createElement('div');
-        rowEl.className = 'list-row';
-        rowEl.draggable = true;
-        rowEl.innerHTML = `
-            <div class="slot-icon">${entry.icon}</div>
-            <div class="list-label">${entry.label}</div>
-            <div class="list-weight">${fmtKg(entry.weight * entry.count)} KG</div>
-            <div class="list-count">x${entry.count}</div>
-        `;
+    TABS.forEach((tab) => {
+        const btn = document.createElement('button');
+        btn.className = 'tab-btn' + (activeTab === tab.id ? ' active' : '');
+        btn.textContent = tab.icon;
+        btn.title = tab.label;
+        btn.addEventListener('click', () => {
+            activeTab = tab.id;
+            renderAll();
+        });
+        tabsEl.appendChild(btn);
+    });
+}
 
-        if (selected && selected.inv === invId && selected.slot === slot) {
-            rowEl.classList.add('selected');
+function renderHeader() {
+    if (!playerSnapshot) return;
+
+    const pct = Math.min(100, (playerSnapshot.weight / playerSnapshot.maxWeight) * 100);
+    weightFill.style.width = `${pct}%`;
+    weightText.textContent = `Weight: ${fmtKg(playerSnapshot.weight)}/${fmtKg(playerSnapshot.maxWeight, 0)}kg`;
+    inventoryTitle.textContent = mode === 'shop' ? 'Shop' : 'Inventory';
+}
+
+function setupClothingDropTarget(el, slotName) {
+    el.addEventListener('dragover', (event) => {
+        event.preventDefault();
+        el.classList.add('drag-over');
+    });
+
+    el.addEventListener('dragleave', () => {
+        el.classList.remove('drag-over');
+    });
+
+    el.addEventListener('drop', (event) => {
+        event.preventDefault();
+        el.classList.remove('drag-over');
+
+        const raw = event.dataTransfer.getData('text/plain');
+        if (!raw) return;
+
+        const from = JSON.parse(raw);
+        if (from.inv !== 'player') return;
+
+        const entry = getEntryFor('player', from.slot);
+        if (!entry || entry.type !== 'clothing') return;
+
+        if (entry.wearSlot !== slotName) {
+            showError('That item does not go in this slot.');
+            return;
         }
 
-        rowEl.addEventListener('dragstart', (event) => {
-            event.dataTransfer.setData('text/plain', JSON.stringify({ inv: invId, slot }));
+        equipItem(from.slot, entry.name);
+    });
+}
+
+function renderClothingGrid() {
+    clothingGrid.innerHTML = '';
+
+    clothingSlots.forEach((slotName) => {
+        const worn = playerSnapshot && playerSnapshot.clothing && playerSnapshot.clothing[slotName];
+        const el = document.createElement('div');
+        el.className = 'clothing-slot' + (worn ? ' has-item' : '');
+        el.innerHTML = worn
+            ? `<div class="slot-icon">${worn.icon}</div><div class="slot-label">${slotName.toUpperCase()}</div>`
+            : `<div class="slot-label">${slotName.toUpperCase()}</div>`;
+
+        el.addEventListener('click', () => {
+            if (worn) unequipItem(slotName);
         });
 
-        rowEl.addEventListener('click', () => onSlotClick(invId, slot, true));
-        setupDragTarget(rowEl, invId, slot);
-        container.appendChild(rowEl);
+        setupClothingDropTarget(el, slotName);
+        clothingGrid.appendChild(el);
+    });
+}
+
+function renderHotbarGrid() {
+    hotbarGrid.innerHTML = '';
+
+    for (let i = 1; i <= 5; i++) {
+        const slotNum = hotbar[i];
+        const entry = slotNum ? findEntry(playerSnapshot, slotNum) : null;
+        const el = document.createElement('div');
+        el.className = 'hotbar-slot';
+        el.innerHTML = `<div class="hotbar-index">${i}</div>` + (entry ? `<div class="slot-icon">${entry.icon}</div>` : '');
+
+        el.addEventListener('dragover', (event) => {
+            event.preventDefault();
+            el.classList.add('drag-over');
+        });
+
+        el.addEventListener('dragleave', () => {
+            el.classList.remove('drag-over');
+        });
+
+        el.addEventListener('drop', (event) => {
+            event.preventDefault();
+            el.classList.remove('drag-over');
+
+            const raw = event.dataTransfer.getData('text/plain');
+            if (!raw) return;
+
+            const from = JSON.parse(raw);
+            if (from.inv !== 'player') return;
+
+            assignHotbar(i, from.slot);
+        });
+
+        el.addEventListener('contextmenu', (event) => {
+            event.preventDefault();
+            if (slotNum) clearHotbarSlot(i);
+        });
+
+        hotbarGrid.appendChild(el);
     }
 }
 
-function renderPlayerPane() {
-    if (viewMode === 'grid') {
-        playerGrid.classList.remove('hidden');
-        playerList.classList.add('hidden');
-        renderGrid(playerGrid, playerSnapshot, 'player');
-    } else {
-        playerGrid.classList.add('hidden');
-        playerList.classList.remove('hidden');
-        renderList(playerList, playerSnapshot, 'player');
+function assignToFirstHotbarSlot(slot) {
+    for (let i = 1; i <= 5; i++) {
+        if (!hotbar[i]) {
+            assignHotbar(i, slot);
+            return;
+        }
     }
 
-    if (playerSnapshot) {
-        const text = `${Math.round(playerSnapshot.weight / 1000)}/${Math.round(playerSnapshot.maxWeight / 1000)} KG`;
-        headerWeightLeft.textContent = text;
-        headerWeightRight.textContent = text;
-    }
-}
-
-function renderDetail(entry) {
-    detailIcon.textContent = entry.icon;
-    detailName.textContent = entry.label;
-    detailWeight.textContent = `${fmtKg(entry.weight)} KG`;
-    detailDescription.textContent = entry.description || '';
-    qtyInput.max = entry.count;
-    qtyInput.value = Math.min(parseInt(qtyInput.value, 10) || 1, entry.count);
+    showNotify('Hotbar is full.');
 }
 
 function renderShop() {
@@ -235,18 +310,6 @@ function renderShop() {
     if (!shopData) return;
 
     shopTitle.textContent = shopData.label;
-
-    const accountWrap = document.createElement('div');
-    accountWrap.className = 'shop-account';
-    accountWrap.innerHTML = `
-        <label>Pay with
-            <select id="shop-account-select">
-                <option value="cash">Cash</option>
-                <option value="bank">Bank</option>
-            </select>
-        </label>
-    `;
-    shopList.appendChild(accountWrap);
 
     shopData.items.forEach((item) => {
         const row = document.createElement('div');
@@ -264,59 +327,51 @@ function renderShop() {
 
         row.querySelector('button').addEventListener('click', () => {
             const qty = parseInt(row.querySelector('input').value, 10) || 1;
-            const account = document.getElementById('shop-account-select').value;
-            buyItem(item.name, qty, account);
+            buyItem(item.name, qty, shopAccountSelect.value);
         });
 
         shopList.appendChild(row);
     });
 }
 
-function renderContextPane() {
-    detailView.classList.add('hidden');
-    secondaryView.classList.add('hidden');
-    shopView.classList.add('hidden');
-    emptyView.classList.add('hidden');
+function renderBottomPanel() {
+    hotbarSection.classList.toggle('hidden', mode !== 'inventory');
+    secondarySection.classList.toggle('hidden', mode !== 'stash' && mode !== 'ground');
+    shopSection.classList.toggle('hidden', mode !== 'shop');
 
-    const selectedEntry = selected && getEntryFor(selected.inv, selected.slot);
-
-    if (selectedEntry) {
-        detailView.classList.remove('hidden');
-        renderDetail(selectedEntry);
-    } else if (mode === 'shop') {
-        shopView.classList.remove('hidden');
-        renderShop();
-    } else if (mode === 'stash' || mode === 'ground') {
-        secondaryView.classList.remove('hidden');
-        contextTitle.textContent = secondarySnapshot ? secondarySnapshot.label : '';
-        renderGrid(contextGrid, secondarySnapshot, secondaryId);
-
-        const pct = secondarySnapshot ? Math.min(100, (secondarySnapshot.weight / secondarySnapshot.maxWeight) * 100) : 0;
-        contextWeightFill.style.width = `${pct}%`;
-        contextWeightText.textContent = secondarySnapshot
-            ? `${fmtKg(secondarySnapshot.weight, 0)} / ${fmtKg(secondarySnapshot.maxWeight, 0)} KG`
+    if (mode === 'stash' || mode === 'ground') {
+        secondaryTitle.textContent = secondarySnapshot ? secondarySnapshot.label : '';
+        secondaryWeightText.textContent = secondarySnapshot
+            ? `${fmtKg(secondarySnapshot.weight, 0)}/${fmtKg(secondarySnapshot.maxWeight, 0)}kg`
             : '';
+        renderSlotGrid(secondaryGrid, secondarySnapshot, secondaryId, null);
+    } else if (mode === 'shop') {
+        renderShop();
     } else {
-        emptyView.classList.remove('hidden');
+        renderHotbarGrid();
     }
 }
 
-function renderFooter() {
-    const entry = selected && selected.inv === 'player' && getEntryFor('player', selected.slot);
+function renderActionRow() {
+    const entry = selected && selected.inv === 'player' && findEntry(playerSnapshot, selected.slot);
 
     useBtn.disabled = !entry;
-    dropBtn.disabled = !entry;
     giveBtn.disabled = !entry;
-    splitBtn.disabled = !entry || entry.count <= 1;
 
-    viewGridBtn.classList.toggle('active', viewMode === 'grid');
-    viewListBtn.classList.toggle('active', viewMode === 'list');
+    if (entry) {
+        amountInput.max = entry.count;
+        const current = parseInt(amountInput.value, 10) || 1;
+        amountInput.value = Math.min(Math.max(1, current), entry.count);
+    }
 }
 
 function renderAll() {
-    renderPlayerPane();
-    renderContextPane();
-    renderFooter();
+    renderClothingGrid();
+    renderTabs();
+    renderHeader();
+    renderMainGrid();
+    renderActionRow();
+    renderBottomPanel();
 }
 
 function onSlotClick(invId, slot, hasItem) {
@@ -328,17 +383,12 @@ function onSlotClick(invId, slot, hasItem) {
         return;
     }
 
-    if (hasItem) {
-        selected = { inv: invId, slot };
-    } else {
-        selected = null;
-    }
-
+    selected = hasItem ? { inv: invId, slot } : null;
     renderAll();
 }
 
-function getQty() {
-    return parseInt(qtyInput.value, 10) || 1;
+function getAmount() {
+    return parseInt(amountInput.value, 10) || 1;
 }
 
 async function moveItem(fromInv, fromSlot, toInv, toSlot) {
@@ -365,34 +415,6 @@ async function useItem(slot) {
 
     if (!result.ok) {
         showError(result.error || 'Failed to use item.');
-        return;
-    }
-
-    playerSnapshot = result.snapshot;
-    selected = null;
-    renderAll();
-}
-
-async function dropItem(slot, count) {
-    clearError();
-    const result = await nuiCallback('dropItem', { slot, count });
-
-    if (!result.ok) {
-        showError(result.error || 'Failed to drop item.');
-        return;
-    }
-
-    playerSnapshot = result.snapshot;
-    selected = null;
-    renderAll();
-}
-
-async function splitStack(slot, count) {
-    clearError();
-    const result = await nuiCallback('splitStack', { slot, count });
-
-    if (!result.ok) {
-        showError(result.error || 'Failed to split stack.');
         return;
     }
 
@@ -428,50 +450,53 @@ async function buyItem(item, count, account) {
     renderAll();
 }
 
-searchInput.addEventListener('input', () => {
-    searchTerm = searchInput.value.trim().toLowerCase();
-    renderPlayerPane();
-});
+async function equipItem(slot, itemName) {
+    clearError();
+    const result = await nuiCallback('equipItem', { slot, itemName });
+
+    if (!result.ok) {
+        showError(result.error || 'Failed to equip item.');
+        return;
+    }
+
+    playerSnapshot = result.snapshot;
+    selected = null;
+    renderAll();
+}
+
+async function unequipItem(slotName) {
+    clearError();
+    const result = await nuiCallback('unequipItem', { slot: slotName });
+
+    if (!result.ok) {
+        showError(result.error || 'Failed to unequip item.');
+        return;
+    }
+
+    playerSnapshot = result.snapshot;
+    renderAll();
+}
+
+async function assignHotbar(index, slot) {
+    await nuiCallback('setHotbar', { index, slot });
+    hotbar[index] = slot;
+    renderHotbarGrid();
+}
+
+async function clearHotbarSlot(index) {
+    await nuiCallback('clearHotbar', { index });
+    hotbar[index] = null;
+    renderHotbarGrid();
+}
 
 closeBtn.addEventListener('click', () => nuiCallback('close'));
-
-viewGridBtn.addEventListener('click', () => {
-    viewMode = 'grid';
-    renderAll();
-});
-
-viewListBtn.addEventListener('click', () => {
-    viewMode = 'list';
-    renderAll();
-});
-
-qtyMinus.addEventListener('click', () => {
-    qtyInput.value = Math.max(1, getQty() - 1);
-});
-
-qtyPlus.addEventListener('click', () => {
-    const max = parseInt(qtyInput.max, 10) || 1;
-    qtyInput.value = Math.min(max, getQty() + 1);
-});
-
-useItemBtn.addEventListener('click', () => {
-    if (selected) useItem(selected.slot);
-});
 
 useBtn.addEventListener('click', () => {
     if (selected) useItem(selected.slot);
 });
 
-dropBtn.addEventListener('click', () => {
-    if (selected) dropItem(selected.slot, getQty());
-});
-
-splitBtn.addEventListener('click', () => {
-    if (selected) splitStack(selected.slot, getQty());
-});
-
 giveBtn.addEventListener('click', () => {
-    if (selected) giveItem(selected.slot, getQty());
+    if (selected) giveItem(selected.slot, getAmount());
 });
 
 window.addEventListener('message', (event) => {
@@ -483,9 +508,10 @@ window.addEventListener('message', (event) => {
         playerSnapshot = data.player;
         secondarySnapshot = data.secondary;
         shopData = data.shop;
+        clothingSlots = data.clothingSlots || [];
+        hotbar = data.hotbar || {};
         selected = null;
-        searchTerm = '';
-        searchInput.value = '';
+        activeTab = 'all';
 
         root.classList.remove('hidden');
         clearError();
@@ -495,6 +521,9 @@ window.addEventListener('message', (event) => {
         mode = null;
         secondaryId = null;
         selected = null;
+    } else if (data.action === 'hotbar') {
+        hotbar = data.hotbar || {};
+        renderHotbarGrid();
     } else if (data.action === 'notify') {
         showNotify(data.message);
     }

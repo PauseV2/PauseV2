@@ -15,3 +15,14 @@ Config.Stashes = {
 Config.StashRange = 2.0 -- meters, how close a player must be to open a stash
 Config.GiveRange = 3.0 -- meters, how close another player must be to receive a give
 Config.DropProp = 'prop_paper_bag_01' -- world prop used for every dropped item, regardless of item type
+
+-- Fixed body/equip slots for the Clothing panel - order here is the display
+-- order in the NUI. Each name must match a `slot` value on some clothing
+-- item in config/items.lua.
+Config.ClothingSlots = {
+    'mask', 'pants', 'necklace',
+    'shirt', 'shoes', 'bracelet',
+    'jacket', 'balaclava', 'watch',
+    'vest', 'glasses', 'backpack',
+    'gloves', 'rings', 'badge',
+}
